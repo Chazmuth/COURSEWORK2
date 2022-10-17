@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scr.main.company.freightroutingnn.controllers.SignUpController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+   <TextField fx:id="emailAddress" promptText="Email Address" />
+   <TextField fx:id="password" promptText="Password" />
+   <Label fx:id="userMessage" />
+   <Button fx:id="signUp" mnemonicParsing="false" text="Sign Up" />
+</VBox>
