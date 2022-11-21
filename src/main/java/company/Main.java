@@ -19,6 +19,7 @@ public class Main {
         String username = input.next();
         System.out.println("Enter Password: ");
         String password = input.next();
+        System.out.println("Validating...");
         accessToken = SQLFunctions.checkUser(password, username);
         if(accessToken){
             this.user = username;
@@ -61,7 +62,7 @@ public class Main {
     }
 
     public void viewJobs(Scanner input) {
-        SQLFunctions.getJobs(this.user);
+        SQLFunctions.formatAsTable(SQLFunctions.getJobs(this.user));
     }
 
     public void run(){

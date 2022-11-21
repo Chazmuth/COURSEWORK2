@@ -1,27 +1,24 @@
-package company.DBUtils;
+package company.DBUtils.JobUtils;
 
 import company.objects.graph.Path;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Job {
-
     //add a add path function to convert a path to a node array
     protected String userID;
     protected LocalDate startDate;
     protected LocalDate endDate;
-    protected int time;
+    protected Boolean complete;
 
-    protected ArrayList<Integer> path;
+    public Job() {
+    }
 
-    public Job(String userID, LocalDate startDate, int time, Path path) {
+
+    public Job(String userID, LocalDate startDate) {
         this.userID = userID;
         this.startDate = startDate;
-        this.time = time;
-        this.endDate = this.startDate.plusDays(time);
-        this.path = path.getNodes();
     }
 
     public String getUserID() {
@@ -36,9 +33,26 @@ public class Job {
         return endDate;
     }
 
-    public ArrayList<Integer> getPath() {
-        return path;
+    public Boolean getComplete() {
+        return complete;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setComplete(Boolean complete) {
+        this.complete = complete;
     }
 
     //add validation so that start cannot equal end
 }
+
