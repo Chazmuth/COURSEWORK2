@@ -8,9 +8,12 @@ public class Path {
     int cost;
     ArrayList<Vertex> route;
 
+    ArrayList<Integer> nodes;
+
     public Path() {
         this.cost = 0;
         this.route = new ArrayList<>();
+        this.nodes = new ArrayList<>();
     }
 
     public void addVertex(Vertex node) {
@@ -22,12 +25,20 @@ public class Path {
         Collections.reverse(route);
         for (int i = 0; i < this.route.size(); i++) {
             if (i < this.route.size() - 1) {
-                stringJoiner.add(Integer.toString(this.route.get(i).getId()));
+                Integer node = this.route.get(i).getId();
+                stringJoiner.add(Integer.toString(node));
+                nodes.add(node);
             } else {
-                stringJoiner.add(Integer.toString(this.route.get(i).getId()));
+                Integer node = this.route.get(i).getId();
+                stringJoiner.add(Integer.toString(node));
+                nodes.add(node);
             }
         }
         return stringJoiner.toString();
+    }
+
+    public ArrayList<Integer> getNodes() {
+        return nodes;
     }
 }
 

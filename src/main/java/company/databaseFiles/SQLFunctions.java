@@ -2,11 +2,14 @@ package company.databaseFiles;
 
 
 import company.DBUtils.ConnectionStatementPair;
+import company.DBUtils.Job;
 import company.objects.graph.Edge;
 import company.objects.graph.Graph;
 
 import java.security.MessageDigest;
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class SQLFunctions {
@@ -133,34 +136,76 @@ public class SQLFunctions {
             statement.setString(2, hashedPassword);
 
             statement.executeUpdate();
+            statement.close();
             //executes the command
             System.out.println("User entered successfully");
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Error in the SQL class: ");
             e.printStackTrace();
         }
     }
 
-    public static boolean validateEmail(String emailAddress){
+    public static void enterJob(Job job) {
+        try {
+            ConnectionStatementPair connectionStatementPair = init();
+
+            PreparedStatement statement = connectionStatementPair.getConnection().prepareStatement("INSERT INTO Jobs(userID, endDate, startDate, complete) VALUES(?,?,?,?)");
+
+            statement.setString(1, job.getUserID());
+            statement.setDate(2, Date.valueOf(job.getEndDate()));
+            statement.setDate(3, Date.valueOf(job.getStartDate()));
+            statement.setBoolean(4, false);
+
+            statement.executeUpdate();
+            //executes the command
+
+            //gets the generated jobID and inputs the associated job nodes
+            ResultSet resultSet = statement.getGeneratedKeys();
+
+            //closes statement to avoid deadlock
+
+            int generatedJobID = -1;
+
+            if(resultSet.next()){
+                generatedJobID = resultSet.getInt(1);
+            }
+
+            //iterate through the node arrray in jobs to add each jobnode
+
+            ArrayList<Integer> nodes = job.getPath();
+            for (int i = 0; i < nodes.size(); i++) {
+                statement = connectionStatementPair.getConnection().prepareStatement("INSERT INTO JobNodes(jobID, nodeID) VALUES(?,?)");
+            }
+
+            resultSet.close();
+            System.out.println("Job entered successfully");
+
+        } catch (Exception e) {
+            System.out.println("Error in the SQL class: ");
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean validateEmail(String emailAddress) {
         String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                 + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         //allows for a regular email address only without dots before the @
         return Pattern.compile(regexPattern).matcher(emailAddress).matches();
     }
 
-    public static String hashPassword(String password){
+    public static String hashPassword(String password) {
         String hashedPassword = "";
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.update(password.getBytes());
             hashedPassword = new String(messageDigest.digest());
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return hashedPassword;
     }
 
     public static void main(String[] args) {
-        System.out.println(checkUser("password", "hfuiah@gmail.com"));
+        //enterJob(new Job("henryjobling@gmail.com", LocalDate.of(2022, 11, 21), 15));
     }
 }
