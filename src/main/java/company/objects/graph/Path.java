@@ -6,12 +6,14 @@ import java.util.StringJoiner;
 
 public class Path {
     int cost;
+    int time;
     ArrayList<Vertex> route;
 
     ArrayList<Integer> nodes;
 
     public Path() {
         this.cost = 0;
+        this.time = 0;
         this.route = new ArrayList<>();
         this.nodes = new ArrayList<>();
     }

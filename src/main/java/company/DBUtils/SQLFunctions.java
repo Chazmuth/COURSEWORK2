@@ -1,10 +1,10 @@
-package company.databaseFiles;
+package company.DBUtils;
 
-
-import company.DBUtils.ConnectionStatementPair;
-import company.DBUtils.Job;
 import company.objects.graph.Edge;
 import company.objects.graph.Graph;
+import company.objects.graph.Path;
+import company.objects.graph.Vertex;
+import company.objects.neuralNetwork.trainingDataGeneration.DijkstraShortestPath;
 
 import java.security.MessageDigest;
 import java.sql.*;
@@ -14,7 +14,9 @@ import java.util.regex.Pattern;
 
 public class SQLFunctions {
 
-    protected static String databaseLocation = (System.getProperty("user.dir") + "\\freightRoutingSystemDatabase.accdb");
+    //   protected static String databaseLocation = (System.getProperty("user.dir") + "\\freightRoutingSystemDatabase.accdb");
+    protected static String databaseLocation = ("freightRoutingSystemDatabase.accdb");
+
 
     public static ConnectionStatementPair init() {
         //a method to return the connection and statement for each method to make it need less code
@@ -127,21 +129,25 @@ public class SQLFunctions {
 
     public static void enterUser(String emailAddress, String password) {
         String hashedPassword = hashPassword(password);
-        try {
-            ConnectionStatementPair connectionStatementPair = init();
+        if (validateEmail(emailAddress)) {
+            try {
+                ConnectionStatementPair connectionStatementPair = init();
 
-            PreparedStatement statement = connectionStatementPair.getConnection().prepareStatement("INSERT INTO Users(userID, password) VALUES(?,?)");
+                PreparedStatement statement = connectionStatementPair.getConnection().prepareStatement("INSERT INTO Users(userID, password) VALUES(?,?)");
 
-            statement.setString(1, emailAddress);
-            statement.setString(2, hashedPassword);
+                statement.setString(1, emailAddress);
+                statement.setString(2, hashedPassword);
 
-            statement.executeUpdate();
-            statement.close();
-            //executes the command
-            System.out.println("User entered successfully");
-        } catch (Exception e) {
-            System.out.println("Error in the SQL class: ");
-            e.printStackTrace();
+                statement.executeUpdate();
+                statement.close();
+                //executes the command
+                System.out.println("User entered successfully");
+            } catch (Exception e) {
+                System.out.println("Error in the SQL class: ");
+                e.printStackTrace();
+            }
+        }else{
+            System.out.println("Please enter a valid email address");
         }
     }
 
@@ -161,20 +167,21 @@ public class SQLFunctions {
 
             //gets the generated jobID and inputs the associated job nodes
             ResultSet resultSet = statement.getGeneratedKeys();
-
-            //closes statement to avoid deadlock
-
             int generatedJobID = -1;
 
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 generatedJobID = resultSet.getInt(1);
             }
 
-            //iterate through the node arrray in jobs to add each jobnode
+            System.out.println(generatedJobID);
 
-            ArrayList<Integer> nodes = job.getPath();
-            for (int i = 0; i < nodes.size(); i++) {
-                statement = connectionStatementPair.getConnection().prepareStatement("INSERT INTO JobNodes(jobID, nodeID) VALUES(?,?)");
+            //iterate through the node array in jobs to add each jobnode
+
+            for (int i = 0; i < 6; i++) {
+                ConnectionStatementPair iteratedConnectionStatementPair = init();
+                PreparedStatement newStatement = iteratedConnectionStatementPair.getConnection().prepareStatement("INSERT INTO JobNodes(jobID, nodeID) VALUES(?,?)");
+                newStatement.setInt(1, generatedJobID);
+                newStatement.setInt(2, i);
             }
 
             resultSet.close();
@@ -206,6 +213,13 @@ public class SQLFunctions {
     }
 
     public static void main(String[] args) {
-        //enterJob(new Job("henryjobling@gmail.com", LocalDate.of(2022, 11, 21), 15));
+        /*Path generatedPath = new Path();
+        for (int i = 0; i < 4; i++) {
+            generatedPath.addVertex(new Vertex(i));
+        }
+        enterJob(new Job("henryjobling@gmail.com", LocalDate.of(2022, 11, 21), 15, generatedPath));*/
+        getTable("JobNodes");
     }
 }
+
+//entering the job nodes doesnt work, check the issue when you can use access

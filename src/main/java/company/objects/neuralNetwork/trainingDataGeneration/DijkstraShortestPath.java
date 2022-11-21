@@ -1,6 +1,7 @@
 package company.objects.neuralNetwork.trainingDataGeneration;
 
-import company.databaseFiles.SQLFunctions;
+import company.DBUtils.SQLFunctions;
+import company.DBUtils.SQLFunctions;
 import company.objects.graph.Edge;
 import company.objects.graph.Graph;
 import company.objects.graph.Path;
@@ -133,7 +134,7 @@ public class DijkstraShortestPath {
     }
 
     public static void main(String[] args) {
-        System.out.println(dijkstra(SQLFunctions.readGraph(), new Vertex(1), new Vertex(0)));
+        System.out.println(dijkstra(SQLFunctions.readGraph(), new Vertex(2), new Vertex(5)));
         generateData();
 
     }

@@ -1,6 +1,5 @@
 package company.objects.neuralNetwork;
 
-import company.databaseFiles.SQLFunctions;
 import company.objects.graph.Graph;
 
 public class GraphMatrix extends Matrix {
