@@ -193,6 +193,35 @@ public class SQLFunctions {
         }
     }
 
+    public static void getJobs(String username){
+        try {
+            ConnectionStatementPair connectionStatementPair = init();
+
+            String sql = "SELECT * FROM Jobs" +
+                    "\nWHERE userID =  "+username; //this is just the sql command
+            ResultSet resultSet = connectionStatementPair.getStatement().executeQuery(sql);
+            //executes the command
+
+            //loops through the result set printing the result
+            while (resultSet.next()) {
+                for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = resultSet.getString(i);
+                    System.out.print(resultSet.getMetaData().getColumnName(i) + " " + columnValue);
+                }
+                System.out.println("\n");
+            }
+
+            //closing connections so there are no deadlocks
+            resultSet.close();
+            connectionStatementPair.closeConnection();
+
+        } catch (Exception e) {
+            System.out.println("Error in the SQL class: ");
+            e.printStackTrace();
+        }
+    }
+
     public static boolean validateEmail(String emailAddress) {
         String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                 + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
@@ -218,7 +247,7 @@ public class SQLFunctions {
             generatedPath.addVertex(new Vertex(i));
         }
         enterJob(new Job("henryjobling@gmail.com", LocalDate.of(2022, 11, 21), 15, generatedPath));*/
-        getTable("JobNodes");
+        getTable("Jobs");
     }
 }
 

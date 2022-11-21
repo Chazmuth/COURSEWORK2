@@ -50,6 +50,7 @@ public class Main {
                 signup(input);
             }
             if(decision.equals("a")){
+                this.user = "henryjobling@gmail.com";
                 break;
             }
         }
@@ -60,7 +61,7 @@ public class Main {
     }
 
     public void viewJobs(Scanner input) {
-        System.out.println("viewing jobs");
+        SQLFunctions.getJobs(this.user);
     }
 
     public void run(){
