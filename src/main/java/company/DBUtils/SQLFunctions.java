@@ -4,12 +4,13 @@ import company.DBUtils.JobUtils.EntryJob;
 import company.DBUtils.JobUtils.Job;
 import company.objects.graph.Edge;
 import company.objects.graph.Graph;
-import dnl.utils.text.table.TextTable;
+import company.objects.graph.Path;
+import company.objects.graph.Vertex;
 
 import java.security.MessageDigest;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class SQLFunctions {
@@ -95,7 +96,7 @@ public class SQLFunctions {
     }
 
     public static boolean checkUser(String password, String emailAddress) {
-        Boolean valid = false;
+        boolean valid = false;
 
         password = hashPassword(password);
 
@@ -133,14 +134,17 @@ public class SQLFunctions {
             try {
                 ConnectionStatementPair connectionStatementPair = init();
 
-                PreparedStatement statement = connectionStatementPair.getConnection().prepareStatement("INSERT INTO Users(userID, password) VALUES(?,?)");
+                PreparedStatement statement = connectionStatementPair.getConnection().
+                        prepareStatement("INSERT INTO Users(userID, password) VALUES(?,?)");
 
                 statement.setString(1, emailAddress);
                 statement.setString(2, hashedPassword);
 
                 statement.executeUpdate();
-                statement.close();
                 //executes the command
+                statement.close();
+                connectionStatementPair.getConnection().close();
+
                 System.out.println("User entered successfully");
             } catch (Exception e) {
                 System.out.println("Error in the SQL class: ");
@@ -155,7 +159,8 @@ public class SQLFunctions {
         try {
             ConnectionStatementPair connectionStatementPair = init();
 
-            PreparedStatement statement = connectionStatementPair.getConnection().prepareStatement("INSERT INTO Jobs(userID, endDate, startDate, complete) VALUES(?,?,?,?)");
+            PreparedStatement statement = connectionStatementPair.getConnection().
+                    prepareStatement("INSERT INTO Jobs(userID, endDate, startDate, complete) VALUES(?,?,?,?)");
 
             statement.setString(1, entryJob.getUserID());
             statement.setDate(2, Date.valueOf(entryJob.getEndDate()));
@@ -177,14 +182,15 @@ public class SQLFunctions {
 
             //iterate through the node array in jobs to add each jobnode
 
-            for (int i = 0; i < 6; i++) {
-                ConnectionStatementPair iteratedConnectionStatementPair = init();
-                PreparedStatement newStatement = iteratedConnectionStatementPair.getConnection().prepareStatement("INSERT INTO JobNodes(jobID, nodeID) VALUES(?,?)");
-                newStatement.setInt(1, generatedJobID);
-                newStatement.setInt(2, i);
+
+            for (int i = 0; i < entryJob.getPath().size(); i++) {
+                System.out.println("reached");
+                enterJobNode(generatedJobID, entryJob.getPath().get(i)+1);
             }
 
             resultSet.close();
+            connectionStatementPair.getConnection().close();
+            statement.close();
             System.out.println("Job entered successfully");
 
         } catch (Exception e) {
@@ -193,12 +199,12 @@ public class SQLFunctions {
         }
     }
 
-    public static List<List<String>> getJobs(String username) {
-        List<List<String>> tableData = new ArrayList<>();
+    public static ArrayList<Job> getJobs(String username) {
+        ArrayList<Job> jobs = new ArrayList<>();
         try {
             ConnectionStatementPair connectionStatementPair = init();
 
-            PreparedStatement statement = connectionStatementPair.getConnection().prepareStatement("SELECT * FROM Jobs WHERE userID = ?");
+            PreparedStatement statement = connectionStatementPair.getConnection().prepareStatement("SELECT userID,startDate,endDate,complete FROM Jobs WHERE userID = ?");
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
             //executes the command
@@ -208,24 +214,13 @@ public class SQLFunctions {
                 System.out.println("You Have No Jobs\nPlease Add a Job to View Your Jobs");
             }
 
-            //String[] columnNames = new String[resultSet.getMetaData().getColumnCount()];
-            //Job[][] data = new Job[resultSet.getMetaData().getColumnCount()]
-
-            ArrayList<String> columnNames = new ArrayList<>();
-
-
             while (resultSet.next()) {
-                ArrayList<String> job = new ArrayList<>();
+                ArrayList<String> jobArray = new ArrayList<>();
                 for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                    job.add(resultSet.getString(i));
-                    if (i == 1) {
-                        columnNames.add(resultSet.getMetaData().getColumnName(i));
-                    }
-                    tableData.add(job);
+                    jobArray.add(resultSet.getString(i));
                 }
+                jobs.add(new Job(jobArray));
             }
-
-            tableData.add(0, columnNames);
 
             //closing connections so there are no deadlocks
             resultSet.close();
@@ -235,7 +230,27 @@ public class SQLFunctions {
             System.out.println("Error in the SQL class: ");
             e.printStackTrace();
         }
-        return tableData;
+        return jobs;
+    }
+
+    public static void enterJobNode(int jobID, int nodeID) {
+        try {
+            ConnectionStatementPair connectionStatementPair = init();
+            PreparedStatement statement = connectionStatementPair.getConnection().
+                    prepareStatement("INSERT INTO JobNodes(jobID, nodeID) VALUES(?,?)");
+
+            statement.setInt(1, jobID);
+            statement.setInt(2, nodeID);
+
+            statement.executeUpdate();
+
+            connectionStatementPair.getConnection().close();
+            statement.close();
+
+        }catch (Exception e) {
+            System.out.println("Error in the SQL class: ");
+            e.printStackTrace();
+        }
     }
 
     public static boolean validateEmail(String emailAddress) {
@@ -257,34 +272,15 @@ public class SQLFunctions {
         return hashedPassword;
     }
 
-    public static String formatAsTable(List<List<String>> rows) {
-        int[] maxLengths = new int[rows.get(0).size()];
-        for (List<String> row : rows) {
-            for (int i = 0; i < row.size(); i++) {
-                maxLengths[i] = Math.max(maxLengths[i], row.get(i).length());
-            }
-        }
-
-        StringBuilder formatBuilder = new StringBuilder();
-        for (int maxLength : maxLengths) {
-            formatBuilder.append("%-").append(maxLength + 2).append("s");
-        }
-        String format = formatBuilder.toString();
-
-        StringBuilder result = new StringBuilder();
-        for (List<String> row : rows) {
-            result.append(String.format(format, row.toArray(new String[0]))).append("\n");
-        }
-        return result.toString();
-    }
-
     public static void main(String[] args) {
-        /*Path generatedPath = new Path();
+        Path generatedPath = new Path();
         for (int i = 0; i < 4; i++) {
             generatedPath.addVertex(new Vertex(i));
         }
-        enterJob(new Job("henryjobling@gmail.com", LocalDate.of(2022, 11, 21), 15, generatedPath));*/
-        //getTable("Jobs");
+        System.out.println(generatedPath.getRoute());
+        enterJob(new EntryJob("henryjobling@gmail.com",
+                LocalDate.of(2022, 11, 21), 15, generatedPath));
+        getTable("JobNodes");
     }
 }
 

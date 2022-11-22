@@ -1,8 +1,11 @@
 package company;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
+import company.DBUtils.JobUtils.Job;
 import company.DBUtils.SQLFunctions;
+import dnl.utils.text.table.TextTable;
 
 public class Main {
     protected String user;
@@ -21,7 +24,7 @@ public class Main {
         String password = input.next();
         System.out.println("Validating...");
         accessToken = SQLFunctions.checkUser(password, username);
-        if(accessToken){
+        if (accessToken) {
             this.user = username;
         }
         return accessToken;
@@ -50,7 +53,7 @@ public class Main {
             if (decision.equals("s")) {
                 signup(input);
             }
-            if(decision.equals("a")){
+            if (decision.equals("a")) {
                 this.user = "henryjobling@gmail.com";
                 break;
             }
@@ -58,14 +61,28 @@ public class Main {
     }
 
     public void addJob(Scanner input) {
-        System.out.println("adding jobs");
+        System.out.println("Enter Start Node: ");
+        int start = input.nextInt();
+        System.out.println("Enter Destination Node: ");
     }
 
     public void viewJobs(Scanner input) {
-        SQLFunctions.formatAsTable(SQLFunctions.getJobs(this.user));
+        System.out.println("fetching...");
+        ArrayList<Job> jobs = SQLFunctions.getJobs(this.user);
+        String[] columnNames = {
+                "ID", "Start Date", "End Date", "Complete"
+        };
+        Object[][] tableData = new Object[jobs.size()][];
+        for (int i = 0; i < jobs.size(); i++) {
+            tableData[i] = jobs.get(i).toArray();
+        }
+        TextTable textTable = new TextTable(columnNames, tableData);
+        textTable.setAddRowNumbering(true);
+        textTable.printTable();
+        System.out.println("\n");
     }
 
-    public void run(){
+    public void run() {
         Scanner input = new Scanner(System.in);
         System.out.println("Welcome to the Freight Routing System");
         loginLogic(input);

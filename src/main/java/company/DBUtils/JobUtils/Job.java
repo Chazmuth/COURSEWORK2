@@ -3,6 +3,8 @@ package company.DBUtils.JobUtils;
 import company.objects.graph.Path;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 
 public class Job {
@@ -12,9 +14,12 @@ public class Job {
     protected LocalDate endDate;
     protected Boolean complete;
 
-    public Job() {
+    public Job(ArrayList<String> jobArray) {
+        this.userID = jobArray.get(0);
+        this.startDate = parseDate(jobArray.get(1));
+        this.endDate = parseDate(jobArray.get(2));
+        this.complete = Boolean.valueOf(jobArray.get(3));
     }
-
 
     public Job(String userID, LocalDate startDate) {
         this.userID = userID;
@@ -37,20 +42,34 @@ public class Job {
         return complete;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public LocalDate parseDate(String unformattedDate){
+        String dateParseInput = unformattedDate.
+                substring(0, unformattedDate.indexOf(" "));
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder().
+                parseCaseInsensitive().
+                parseLenient().
+                appendPattern("[yyyy-MM-dd]");
+        DateTimeFormatter formatter = builder.toFormatter();
+        return LocalDate.parse(dateParseInput, formatter);
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+    public Object[] toArray(){
+        Object[] array = new Object[4];
+        array[0] = this.userID;
+        array[1] = this.startDate;
+        array[2] = this.endDate;
+        array[3] = this.complete;
+        return array;
     }
 
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public void setComplete(Boolean complete) {
-        this.complete = complete;
+    @Override
+    public String toString() {
+        return "Job{" +
+                "userID='" + userID + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", complete=" + complete +
+                '}';
     }
 
     //add validation so that start cannot equal end

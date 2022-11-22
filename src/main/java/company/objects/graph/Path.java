@@ -8,7 +8,6 @@ public class Path {
     int cost;
     int time;
     ArrayList<Vertex> route;
-
     ArrayList<Integer> nodes;
 
     public Path() {
@@ -27,11 +26,11 @@ public class Path {
         Collections.reverse(route);
         for (int i = 0; i < this.route.size(); i++) {
             if (i < this.route.size() - 1) {
-                Integer node = this.route.get(i).getId();
+                int node = this.route.get(i).getId();
                 stringJoiner.add(Integer.toString(node));
                 nodes.add(node);
             } else {
-                Integer node = this.route.get(i).getId();
+                int node = this.route.get(i).getId();
                 stringJoiner.add(Integer.toString(node));
                 nodes.add(node);
             }
