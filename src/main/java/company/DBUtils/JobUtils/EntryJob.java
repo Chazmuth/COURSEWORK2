@@ -12,10 +12,10 @@ public class EntryJob extends Job{
     protected int time;
     protected ArrayList<Integer> path;
 
-    public EntryJob(String userID, LocalDate startDate, int time, Path path) {
-        super(userID, startDate);
+    public EntryJob(String userID, String startDate, boolean strip, int time, Path path) {
+        super(userID);
         this.userID = userID;
-        this.startDate = startDate;
+        this.startDate = parseDate(startDate, strip);
         this.time = time;
         this.endDate = this.startDate.plusDays(time);
         this.path = path.getNodes();

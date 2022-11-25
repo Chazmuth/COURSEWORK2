@@ -1,11 +1,19 @@
 package company;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import company.DBUtils.JobUtils.EntryJob;
 import company.DBUtils.JobUtils.Job;
+
+import static company.DBUtils.JobUtils.Job.parseDate;
+
 import company.DBUtils.SQLFunctions;
+import company.objects.graph.Path;
+import company.objects.neuralNetwork.trainingDataGeneration.DijkstraShortestPath;
 import dnl.utils.text.table.TextTable;
+
 
 public class Main {
     protected String user;
@@ -62,8 +70,19 @@ public class Main {
 
     public void addJob(Scanner input) {
         System.out.println("Enter Start Node: ");
-        int start = input.nextInt();
+        int source = input.nextInt();
         System.out.println("Enter Destination Node: ");
+        int destination = input.nextInt();
+        System.out.println("Calculating...");
+        Path route = DijkstraShortestPath.dijkstra(source, destination);
+        System.out.println("Enter a date in the format [yyyy-MM-dd]: ");
+        String startDate = input.next();
+
+        System.out.println(startDate);
+        int time = route.getCost();
+        EntryJob newJob = new EntryJob(this.user, startDate, false,
+                time, route);
+        SQLFunctions.enterJob(newJob);
     }
 
     public void viewJobs(Scanner input) {
@@ -86,7 +105,7 @@ public class Main {
         Scanner input = new Scanner(System.in);
         System.out.println("Welcome to the Freight Routing System");
         loginLogic(input);
-        Boolean logoutToken = false;
+        boolean logoutToken = false;
         while (true) {
             if (logoutToken) {
                 break;

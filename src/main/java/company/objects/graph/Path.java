@@ -38,6 +38,10 @@ public class Path {
         return stringJoiner.toString();
     }
 
+    public int getCost() {
+        return cost;
+    }
+
     public ArrayList<Integer> getNodes() {
         return nodes;
     }

@@ -16,14 +16,13 @@ public class Job {
 
     public Job(ArrayList<String> jobArray) {
         this.userID = jobArray.get(0);
-        this.startDate = parseDate(jobArray.get(1));
-        this.endDate = parseDate(jobArray.get(2));
+        this.startDate = parseDate(jobArray.get(1), true);
+        this.endDate = parseDate(jobArray.get(2), true);
         this.complete = Boolean.valueOf(jobArray.get(3));
     }
 
-    public Job(String userID, LocalDate startDate) {
+    public Job(String userID) {
         this.userID = userID;
-        this.startDate = startDate;
     }
 
     public String getUserID() {
@@ -42,9 +41,14 @@ public class Job {
         return complete;
     }
 
-    public LocalDate parseDate(String unformattedDate){
-        String dateParseInput = unformattedDate.
-                substring(0, unformattedDate.indexOf(" "));
+    public static LocalDate parseDate(String unformattedDate, boolean strip) {
+        String dateParseInput;
+        if (strip) {
+            dateParseInput = unformattedDate.
+                    substring(0, unformattedDate.indexOf(" "));
+        }else{
+            dateParseInput = unformattedDate;
+        }
         DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder().
                 parseCaseInsensitive().
                 parseLenient().
@@ -53,7 +57,7 @@ public class Job {
         return LocalDate.parse(dateParseInput, formatter);
     }
 
-    public Object[] toArray(){
+    public Object[] toArray() {
         Object[] array = new Object[4];
         array[0] = this.userID;
         array[1] = this.startDate;

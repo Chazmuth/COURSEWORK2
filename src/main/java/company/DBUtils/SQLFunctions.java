@@ -273,13 +273,6 @@ public class SQLFunctions {
     }
 
     public static void main(String[] args) {
-        Path generatedPath = new Path();
-        for (int i = 0; i < 4; i++) {
-            generatedPath.addVertex(new Vertex(i));
-        }
-        System.out.println(generatedPath.getRoute());
-        enterJob(new EntryJob("henryjobling@gmail.com",
-                LocalDate.of(2022, 11, 21), 15, generatedPath));
         getTable("JobNodes");
     }
 }
