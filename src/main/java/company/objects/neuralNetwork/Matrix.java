@@ -154,18 +154,22 @@ class Matrix {
     //the result
 
     public static Matrix multiply(Matrix a, Matrix b) {
-        Matrix temp = new Matrix(a.rows, b.cols, "n");
-        for (int i = 0; i < temp.rows; i++) {
-            for (int j = 0; j < temp.cols; j++) {
-                double sum = 0;
-                for (int k = 0; k < a.rows; k++) {
-                    sum += a.data[i][k] * b.data[k][j];
+        Matrix temp=new Matrix(a.rows,b.cols, "z");
+        for(int i=0;i<temp.rows;i++)
+        {
+            for(int j=0;j<temp.cols;j++)
+            {
+                double sum=0;
+                for(int k=0;k<a.cols;k++)
+                {
+                    sum+=a.data[i][k]*b.data[k][j];
                 }
-                temp.data[i][j] = sum;
+                temp.data[i][j]=sum;
             }
         }
         return temp;
     }
+
 
     public static Matrix fromArray(double[] x) {
         Matrix temp = new Matrix(1, x.length, "n");

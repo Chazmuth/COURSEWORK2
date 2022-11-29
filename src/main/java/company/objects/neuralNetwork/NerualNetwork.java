@@ -15,9 +15,9 @@ public class NerualNetwork {
     public NerualNetwork(int inputSize, int hiddenAmount, int hiddenSize, int outputSize) {
         this.inputSize = inputSize;
         this.weights.add(new Matrix(inputSize, hiddenSize, "r"));
-        this.biases.add(new Matrix(1, hiddenSize, "r"));
+        this.biases.add(new Matrix(hiddenSize, 1, "r"));
         this.weights.add(new Matrix(hiddenSize, outputSize, "r"));
-        this.biases.add(new Matrix(1, outputSize, "r"));
+        this.biases.add(new Matrix(outputSize, 1, "r"));
         //add iteration here to define the layers
     }
 
@@ -42,27 +42,36 @@ public class NerualNetwork {
     }
 
     public void backwardPropagation(Matrix result, Matrix expectedResult, double learningRate) {
-        Matrix derivativeBiases2 = Matrix.subtract(result, expectedResult);
-        derivativeBiases2.multiply(result.dsigmoid().dsigmoid());
+        //calculates error
+        Matrix error = Matrix.subtract(expectedResult, result);
 
-        Matrix derivativeWeights2 = Matrix.multiply(derivativeBiases2, this.hiddenLayerStore.get(0));
+        Matrix derivativeBiases2 = result.dsigmoid();
+        derivativeBiases2.multiply(error);
 
-        Matrix derivativeBiases1 = Matrix.multiply(Matrix.multiply(derivativeBiases2, this.weights.get(1)), this.hiddenLayerStore.get(0).dsigmoid().dsigmoid());
+        Matrix transposedHidden = Matrix.transpose(this.hiddenLayerStore.get(0));
+        Matrix derivativeWeights2 = Matrix.multiply(derivativeBiases2, transposedHidden);
 
-        Matrix derivativeWeights1 = Matrix.multiply(this.input, derivativeBiases1);
+        Matrix transposedHiddenWeights = Matrix.transpose(this.weights.get(1));
+        transposedHiddenWeights.multiply(error);
+        Matrix hiddenGradient = this.hiddenLayerStore.get(0).dsigmoid();
+        Matrix derivativeBiases1 = Matrix.multiply(transposedHiddenWeights, hiddenGradient);
+
+
+        Matrix derivativeWeights1 = Matrix.transpose(this.input);
+        derivativeWeights1.multiply(derivativeBiases1);
 
         //gradient decente
         derivativeBiases1.multiply(learningRate);
-        this.biases.get(0).subtract(derivativeBiases1);
+        this.biases.get(0).add(derivativeBiases1);
 
         derivativeWeights1.multiply(learningRate);
-        this.weights.get(0).subtract(derivativeWeights1);
+        this.weights.get(0).add(derivativeWeights1);
 
         derivativeBiases2.multiply(learningRate);
-        this.biases.get(1).subtract(derivativeBiases2);
+        this.biases.get(1).add(derivativeBiases2);
 
         derivativeWeights2.multiply(learningRate);
-        this.weights.get(1).subtract(derivativeWeights2);
+        this.weights.get(1).add(derivativeWeights2);
     }
 
     public void train(int epochs, double learningRate, ArrayList<Matrix> traingingDataX,
@@ -102,7 +111,7 @@ public class NerualNetwork {
         yin = Matrix.fromArray(new double[]{0});
         traingingDataY.add(yin);
 
-        net.train(10000000, 0.5, traingingDataX, traingingDataY);
+        net.train(10000, 0.5, traingingDataX, traingingDataY);
     }
 }
 
