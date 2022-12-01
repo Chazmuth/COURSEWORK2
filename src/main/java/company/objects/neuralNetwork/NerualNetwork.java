@@ -1,89 +1,52 @@
 package company.objects.neuralNetwork;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NerualNetwork {
-    int inputSize;
     Matrix input;
     ArrayList<Matrix> weights = new ArrayList<>();
     ArrayList<Matrix> biases = new ArrayList<>();
-    ArrayList<Matrix> hiddenLayerStore = new ArrayList<>();
+
+    ArrayList<Matrix> hiddens = new ArrayList<>();
+
+    Matrix output;
     //for each loop of the training process the result of each
     //hidden layer needs to be used to calculate the amounts each
     //weight matrix needs to change by
 
     public NerualNetwork(int inputSize, int hiddenAmount, int hiddenSize, int outputSize) {
-        this.inputSize = inputSize;
-        this.weights.add(new Matrix(inputSize, hiddenSize, "r"));
-        this.biases.add(new Matrix(hiddenSize, 1, "r"));
-        this.weights.add(new Matrix(hiddenSize, outputSize, "r"));
-        this.biases.add(new Matrix(outputSize, 1, "r"));
+        weights.add(new Matrix(hiddenSize, inputSize, "r"));
+        weights.add(new Matrix(outputSize, hiddenSize, "r"));
+
+        biases.add(new Matrix(hiddenSize, 1, "r"));
+        biases.add(new Matrix(outputSize, 1, "r"));
         //add iteration here to define the layers
     }
 
-    public Matrix feedForward(Matrix inputMatrix) {
-        for (int i = 0; i < weights.size(); i++) {
-            this.input = inputMatrix;
-            inputMatrix = Matrix.multiply(inputMatrix, weights.get(i));
-            inputMatrix.add(biases.get(i));
-            inputMatrix.sigmoid();
-            this.hiddenLayerStore.add(inputMatrix);
+    public List<Double> feedForward(double[] xInput) {
+        Matrix input = Matrix.fromArray(xInput);
+        hiddens.add(Matrix.multiply(weights.get(0), input));
+        hiddens.get(0).add(biases.get(0));
+        hiddens.get(0).sigmoid();
 
-            //not outputing a 1X1 matrix as it should in the given case in main
-        }
-        return inputMatrix;
-    }
+        output = Matrix.multiply(weights.get(1), hiddens.get(0));
+        output.add(biases.get(1));
+        output.sigmoid();
 
-
-    public double error(Matrix result, Matrix expectedResult) {
-        Matrix resultMinusExpected = Matrix.subtract(result, expectedResult);
-        resultMinusExpected.power(2);
-        return 0.5 * resultMinusExpected.sum();
+        return output.toArray();
     }
 
     public void backwardPropagation(Matrix result, Matrix expectedResult, double learningRate) {
-        //calculates error
-        Matrix error = Matrix.subtract(expectedResult, result);
 
-        Matrix derivativeBiases2 = result.dsigmoid();
-        derivativeBiases2.multiply(error);
-
-        Matrix transposedHidden = Matrix.transpose(this.hiddenLayerStore.get(0));
-        Matrix derivativeWeights2 = Matrix.multiply(derivativeBiases2, transposedHidden);
-
-        Matrix transposedHiddenWeights = Matrix.transpose(this.weights.get(1));
-        transposedHiddenWeights.multiply(error);
-        Matrix hiddenGradient = this.hiddenLayerStore.get(0).dsigmoid();
-        Matrix derivativeBiases1 = Matrix.multiply(transposedHiddenWeights, hiddenGradient);
-
-
-        Matrix derivativeWeights1 = Matrix.transpose(this.input);
-        derivativeWeights1.multiply(derivativeBiases1);
-
-        //gradient decente
-        derivativeBiases1.multiply(learningRate);
-        this.biases.get(0).add(derivativeBiases1);
-
-        derivativeWeights1.multiply(learningRate);
-        this.weights.get(0).add(derivativeWeights1);
-
-        derivativeBiases2.multiply(learningRate);
-        this.biases.get(1).add(derivativeBiases2);
-
-        derivativeWeights2.multiply(learningRate);
-        this.weights.get(1).add(derivativeWeights2);
     }
 
-    public void train(int epochs, double learningRate, ArrayList<Matrix> traingingDataX,
-                      ArrayList<Matrix> traingingDataY) {
+    public void train(int epochs, double learningRate, double[][] traingingDataX,
+                      double[][] traingingDataY) {
         for (int i = 0; i < epochs; i++) {
+            hiddens.clear();
             double error = 0;
-            for (int j = 0; j < traingingDataX.size(); j++) {
-                Matrix result = feedForward(traingingDataX.get(j));
-                Matrix expectedResult = traingingDataY.get(j);
-                error += error(result, expectedResult);
-                backwardPropagation(result, expectedResult, learningRate);
-            }
+            int sampleNumber = (int)(Math.random() * traingingDataX)
             System.out.println("INFO: EPOCH: " + i + 1 + " ERROR: " + error);
         }
     }

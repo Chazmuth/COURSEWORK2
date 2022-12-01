@@ -28,11 +28,11 @@ public class DijkstraShortestPath {
         ArrayList<Vertex> graphVertecies = graph.getVertices();
 
 
-        for (int i = 0; i < graphVertecies.size(); i++) {
-            if (graphVertecies.get(i).getId() == sourceVertex.getId()) {
-                unvisited.add(new RoutingVertex(graphVertecies.get(i), 0, null));
+        for (Vertex graphVertecy : graphVertecies) {
+            if (graphVertecy.getId() == sourceVertex.getId()) {
+                unvisited.add(new RoutingVertex(graphVertecy, 0, null));
             } else {
-                unvisited.add(new RoutingVertex(graphVertecies.get(i), Integer.MAX_VALUE, null));
+                unvisited.add(new RoutingVertex(graphVertecy, Integer.MAX_VALUE, null));
             }
         }
 
