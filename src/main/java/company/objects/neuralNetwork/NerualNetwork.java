@@ -24,57 +24,42 @@ public class NerualNetwork {
         //add iteration here to define the layers
     }
 
-    public List<Double> feedForward(double[] xInput) {
+    public Matrix feedForward(double[] xInput) {
         Matrix input = Matrix.fromArray(xInput);
+
+        //input to hidden
         hiddens.add(Matrix.multiply(weights.get(0), input));
         hiddens.get(0).add(biases.get(0));
         hiddens.get(0).sigmoid();
 
+        //hidden to output
         output = Matrix.multiply(weights.get(1), hiddens.get(0));
         output.add(biases.get(1));
         output.sigmoid();
 
-        return output.toArray();
+        return output;
     }
 
-    public void backwardPropagation(Matrix result, Matrix expectedResult, double learningRate) {
+    public void backwardPropagation(Matrix output, double [] expectedResultY, double learningRate) {
+        Matrix expectedResult = Matrix.fromArray(expectedResultY);
+        Matrix error = Matrix.subtract(expectedResult, output);
+
+        Matrix biases1Gradient = output.dsigmoid();
 
     }
 
-    public void train(int epochs, double learningRate, double[][] traingingDataX,
+    public void fit(int epochs, double learningRate, double[][] traingingDataX,
                       double[][] traingingDataY) {
         for (int i = 0; i < epochs; i++) {
             hiddens.clear();
             double error = 0;
-            int sampleNumber = (int)(Math.random() * traingingDataX)
+            int sampleNumber = (int)(Math.random() * traingingDataX.length);
             System.out.println("INFO: EPOCH: " + i + 1 + " ERROR: " + error);
         }
     }
 
     public static void main(String[] args) {
-        NerualNetwork net = new NerualNetwork(2, 0, 4, 1);
 
-        ArrayList<Matrix> traingingDataX = new ArrayList<>();
-        Matrix xin = Matrix.fromArray(new double[]{0, 0});
-        traingingDataX.add(xin);
-        xin = Matrix.fromArray(new double[]{0, 1});
-        traingingDataX.add(xin);
-        xin = Matrix.fromArray(new double[]{1, 0});
-        traingingDataX.add(xin);
-        xin = Matrix.fromArray(new double[]{1, 1});
-        traingingDataX.add(xin);
-
-        ArrayList<Matrix> traingingDataY = new ArrayList<>();
-        Matrix yin = Matrix.fromArray(new double[]{0});
-        traingingDataY.add(yin);
-        yin = Matrix.fromArray(new double[]{1});
-        traingingDataY.add(yin);
-        yin = Matrix.fromArray(new double[]{1});
-        traingingDataY.add(yin);
-        yin = Matrix.fromArray(new double[]{0});
-        traingingDataY.add(yin);
-
-        net.train(10000, 0.5, traingingDataX, traingingDataY);
     }
 }
 
@@ -88,4 +73,3 @@ public class NerualNetwork {
 
 //the maths for this neural network (the most basic feedforward neural
 //network) is from https://medium.com/swlh/mathematics-behind-basic-feed-forward-neural-network-3-layers-python-from-scratch-df88085c8049
-

@@ -50,18 +50,18 @@ class Matrix {
 
     //adds a double to every number in this matrix
 
-    public void add(Matrix matrix) {
-        if (matrix.rows == 1) {
-            for (int i = 0; i < this.rows; i++) {
-                for (int j = 0; j < this.cols; j++) {
-                    this.data[i][j] += matrix.data[0][j];
-                }
-            }
-        } else {
-            for (int i = 0; i < this.rows; i++) {
-                for (int j = 0; j < this.cols; j++) {
-                    this.data[i][j] += matrix.data[i][j];
-                }
+    public void add(Matrix m)
+    {
+        if(cols!=m.cols || rows!=m.rows) {
+            System.out.println("Shape Mismatch");
+            return;
+        }
+
+        for(int i=0;i<rows;i++)
+        {
+            for(int j=0;j<cols;j++)
+            {
+                this.data[i][j]+=m.data[i][j];
             }
         }
     }

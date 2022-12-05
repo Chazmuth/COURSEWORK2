@@ -1,13 +1,10 @@
 package company;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import company.DBUtils.JobUtils.EntryJob;
 import company.DBUtils.JobUtils.Job;
-
-import static company.DBUtils.JobUtils.Job.parseDate;
 
 import company.DBUtils.SQLFunctions;
 import company.objects.graph.Path;
