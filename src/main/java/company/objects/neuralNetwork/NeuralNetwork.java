@@ -1,6 +1,7 @@
 package company.objects.neuralNetwork;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class NeuralNetwork {
     Matrix input;
@@ -38,6 +39,8 @@ public class NeuralNetwork {
         output.add(biases.get(1));
         output.sigmoid();
 
+        System.out.println("Feedforward Complete");
+
         return output;
     }
 
@@ -55,7 +58,7 @@ public class NeuralNetwork {
         Matrix deltaWeight1 = Matrix.multiply(biases1Gradient, hiddenTransposed);
 
         //adds the gradient to the weight 1 and biase 1
-        this.weights.get(1).add(deltaWeight1);
+        this.weights.get(1).add(deltaWeight1.toArray().get(0));
         this.biases.get(1).add(biases1Gradient);
 
         //calculates hidden errors
@@ -74,13 +77,14 @@ public class NeuralNetwork {
         //adds the gradient to the weight 0 and biase 0
         this.weights.get(0).add(deltaWeight0);
         this.biases.get(0).add(hiddenGradient);
+
+        System.out.println("Backpropagation Complete");
     }
 
     public void fit(int epochs, double learningRate, double[][] traingingDataX,
                     double[][] traingingDataY) {
         for (int i = 0; i < epochs; i++) {
             hiddens.clear();
-            double error = 0;
             int sampleNumber = (int) (Math.random() * traingingDataX.length);
             //does a training pass
             Matrix output = feedForward(traingingDataX[sampleNumber]);
@@ -89,6 +93,8 @@ public class NeuralNetwork {
             System.out.println("INFO: EPOCH: " + i + 1 + " OUTPUT: " + output.toString());
         }
     }
+
+
 
     public static void main(String[] args) {
         double[][] X = {
@@ -102,6 +108,8 @@ public class NeuralNetwork {
         };
         NeuralNetwork nn = new NeuralNetwork(2,0,10, 1);
         nn.fit(50000, 0.1, X, Y);
+        System.out.println(Arrays.toString(X[1]));
+        System.out.println(nn.feedForward(X[1]));
     }
 }
 

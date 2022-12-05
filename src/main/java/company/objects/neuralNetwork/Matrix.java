@@ -117,16 +117,6 @@ class Matrix {
 
     //raises to the power of then double power
 
-    public double sum() {
-        double x = 0;
-        for (int i = 0; i < this.rows; i++) {
-            for (int j = 0; j < this.cols; j++) {
-                x += data[i][j];
-            }
-        }
-        return x;
-    }
-
     //makes a sum of the matrix
 
     public static Matrix transpose(Matrix matrix) {
@@ -148,7 +138,7 @@ class Matrix {
         for (int i = 0; i < temp.rows; i++) {
             for (int j = 0; j < temp.cols; j++) {
                 double sum = 0;
-                for (int k = 0; k < a.cols - 1; k++) {
+                for (int k = 0; k < a.cols; k++) {
                     sum += a.data[i][k] * b.data[k][j];
                 }
                 temp.data[i][j] = sum;
