@@ -2,6 +2,7 @@ package company.objects.neuralNetwork;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class NeuralNetwork {
     Matrix input;
@@ -38,8 +39,6 @@ public class NeuralNetwork {
         output = Matrix.multiply(weights.get(1), hiddens.get(0));
         output.add(biases.get(1));
         output.sigmoid();
-
-        System.out.println("Feedforward Complete");
 
         return output;
     }
@@ -78,7 +77,6 @@ public class NeuralNetwork {
         this.weights.get(0).add(deltaWeight0);
         this.biases.get(0).add(hiddenGradient);
 
-        System.out.println("Backpropagation Complete");
     }
 
     public void fit(int epochs, double learningRate, double[][] traingingDataX,
@@ -90,11 +88,23 @@ public class NeuralNetwork {
             Matrix output = feedForward(traingingDataX[sampleNumber]);
             backwardPropagation(output, traingingDataY[sampleNumber], learningRate);
 
-            System.out.println("INFO: EPOCH: " + i + 1 + " OUTPUT: " + output.toString());
+            System.out.println("INFO: EPOCH: " + i + 1 + " INPUT: " + Arrays.toString(traingingDataX[sampleNumber]) + " OUTPUT: " + output.toString());
         }
     }
 
+    public List<Double> predict(double[] X)
+    {
+        Matrix input = Matrix.fromArray(X);
+        Matrix hidden = Matrix.multiply(this.weights.get(0), input);
+        hidden.add(this.biases.get(0));
+        hidden.sigmoid();
 
+        Matrix output = Matrix.multiply(this.weights.get(1),hidden);
+        output.add(this.biases.get(1));
+        output.sigmoid();
+
+        return output.toArray();
+    }
 
     public static void main(String[] args) {
         double[][] X = {
@@ -108,8 +118,10 @@ public class NeuralNetwork {
         };
         NeuralNetwork nn = new NeuralNetwork(2,0,10, 1);
         nn.fit(50000, 0.1, X, Y);
+        System.out.println(Arrays.toString(X[0]));
+        System.out.println(nn.predict(X[0]));
         System.out.println(Arrays.toString(X[1]));
-        System.out.println(nn.feedForward(X[1]));
+        System.out.println(nn.predict(X[1]));
     }
 }
 
