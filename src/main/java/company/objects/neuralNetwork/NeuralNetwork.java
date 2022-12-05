@@ -13,8 +13,8 @@ public class NeuralNetwork {
     ArrayList<Matrix> hiddens = new ArrayList<>();
     Matrix output;
 
-    double [][] X;
-    double [][] Y;
+    double[][] X;
+    double[][] Y;
     //for each loop of the training process the result of each
     //hidden layer needs to be used to calculate the amounts each
     //weight matrix needs to change by
@@ -26,6 +26,14 @@ public class NeuralNetwork {
 
     public ArrayList<Matrix> getBiases() {
         return biases;
+    }
+
+    public double[][] getX() {
+        return X;
+    }
+
+    public double[][] getY() {
+        return Y;
     }
 
     public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize,
@@ -53,26 +61,76 @@ public class NeuralNetwork {
         //add iteration here to define the layers
     }
 
-    public void getTrainingData(){
-        double[][] X;
-        double[][] Y;
+    public void getTrainingData() {
+        ArrayList<double[]> XDynamic = new ArrayList<>();
+        ArrayList<double[]> YDynamic = new ArrayList<>();
 
-        try{
+        try {
             File trainingData = new File("src/main/java/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
-            BufferedReader fileReader = new BufferedReader(new FileReader(trainingData));
+            Scanner fileReader = new Scanner(trainingData);
 
-            String data;
-
-            while ((data = fileReader.readLine()) != null){
-                System.out.println(data);
+            int arraySize = 0;
+            boolean XReading = true;
+            int lineNumber = 1;
+            while (fileReader.hasNextLine()) {
+                if (lineNumber == 1) {
+                    arraySize = fileReader.nextInt();
+                } else {
+                    System.out.println("line number: " + lineNumber);
+                    lineNumber++;
+                    String data = fileReader.nextLine();
+                    System.out.println("Data: " + data);
+                    if (data.equals("Y")) {
+                        XReading = false;
+                    } else {
+                        String[] dataLine = data.split(",");
+                        double[] arrayToEnter = new double[arraySize];
+                        for (int i = 0; i < dataLine.length; i++) {
+                            arrayToEnter[Integer.parseInt(dataLine[i])] = 1;
+                        }
+                        if (XReading) {
+                            System.out.println(Arrays.toString(arrayToEnter));
+                            XDynamic.add(arrayToEnter);
+                        } else {
+                            System.out.println(Arrays.toString(arrayToEnter));
+                            YDynamic.add(arrayToEnter);
+                        }
+                    }
+                }
+                lineNumber++;
             }
-
-        }catch(Exception exception){
+        } catch (Exception exception) {
             System.out.println("There was a file error");
             exception.printStackTrace();
         }
-        //this.X = X;
-        //this.Y = Y;
+        System.out.println("Data formatted");
+        System.out.println("X");
+        for (int i = 0; i < XDynamic.size(); i++) {
+            System.out.println(Arrays.toString(XDynamic.get(i)));
+        }
+        System.out.println("");
+        System.out.println("Y");
+        for (int i = 0; i < YDynamic.size(); i++) {
+            System.out.println(Arrays.toString(YDynamic.get(i)));
+        }
+        double[][] X = new double[XDynamic.size()][];
+        double[][] Y = new double[YDynamic.size()][];
+
+        for (int i = 0; i < XDynamic.size(); i++) {
+            X[i] = XDynamic.get(i);
+            Y[i] = YDynamic.get(i);
+        }
+        this.X = X;
+        this.Y = Y;
+    }
+
+    public void readFile() throws FileNotFoundException {
+        File trainingData = new File("src/main/java/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
+        Scanner reader = new Scanner(trainingData);
+
+        while (reader.hasNext()) {
+            System.out.println(reader.nextLine());
+        }
     }
 
     public NeuralNetwork(Matrix inputToHiddenWeights, Matrix inputToHiddenBiases,
@@ -174,14 +232,14 @@ public class NeuralNetwork {
     public void saveNetwork(String filename) {
         File saveFile;
         try {
-            saveFile = new File("src/main/java/company/objects/neuralNetwork/saveFiles/"+filename);
+            saveFile = new File("src/main/java/company/objects/neuralNetwork/saveFiles/" + filename);
             System.out.println("Save File Created");
         } catch (Exception e1) {
             System.out.println("An error occured");
             e1.printStackTrace();
             saveFile = null;
         }
-        try{
+        try {
             assert saveFile != null;
             Writer fileWriter = new FileWriter(saveFile);
             for (int i = 0; i < this.weights.size(); i++) {
@@ -194,14 +252,14 @@ public class NeuralNetwork {
                 fileWriter.write(text);
             }
             System.out.println("Biases Written");
-        }catch (Exception e2) {
+        } catch (Exception e2) {
             System.out.println("An error occured");
             e2.printStackTrace();
         }
         //idk why this wont work, will find out on wednesday
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         double[][] X = {
                 {0, 0},
                 {1, 0},
@@ -235,6 +293,10 @@ public class NeuralNetwork {
         NeuralNetwork nn = new NeuralNetwork(2, 0, 10, 1, X, Y);
 
         nn.getTrainingData();
+        System.out.println(Arrays.deepToString(nn.getX()));
+        System.out.println(Arrays.deepToString(nn.getY()));
+
+        nn.readFile();
     }
 }
 

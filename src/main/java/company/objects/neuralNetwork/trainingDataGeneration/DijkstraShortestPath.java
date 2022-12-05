@@ -126,8 +126,10 @@ public class DijkstraShortestPath {
             assert trainingData != null;
             Writer fileWriter = new FileWriter(trainingData);
             Graph graph = readGraph();
-            for (int i = 0; i < graph.getVertexAmount(); i++) {
-                for (int j = 0; j < graph.getVertexAmount(); j++) {
+            fileWriter.write(Integer.toString(graph.getVertexAmount()-1));
+            fileWriter.write("\n");
+            for (int i = 0; i < graph.getVertexAmount()-1; i++) {
+                for (int j = 0; j < graph.getVertexAmount()-1; j++) {
                     if (i != j) {
                         String start = Integer.toString(i);
                         String end = Integer.toString(j);
@@ -137,9 +139,10 @@ public class DijkstraShortestPath {
                     }
                 }
             }
+            fileWriter.write("Y");
             fileWriter.write("\n");
-            for (int i = 0; i < graph.getVertexAmount(); i++) {
-                for (int j = 0; j < graph.getVertexAmount(); j++) {
+            for (int i = 0; i < graph.getVertexAmount()-1; i++) {
+                for (int j = 0; j < graph.getVertexAmount()-1; j++) {
                     if (i != j) {
                         System.out.println(dijkstra(i, j).getRoute());
                         fileWriter.write(dijkstra(i, j).getRoute() + "\n");
