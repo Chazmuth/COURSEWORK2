@@ -1,31 +1,90 @@
 package company.objects.neuralNetwork;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class NeuralNetwork {
     Matrix input;
     ArrayList<Matrix> weights = new ArrayList<>();
     ArrayList<Matrix> biases = new ArrayList<>();
-
     ArrayList<Matrix> hiddens = new ArrayList<>();
-
     Matrix output;
+
+    double [][] X;
+    double [][] Y;
     //for each loop of the training process the result of each
     //hidden layer needs to be used to calculate the amounts each
     //weight matrix needs to change by
 
-    public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize, int outputSize) {
-        weights.add(new Matrix(hiddenSize, inputSize, "r"));
-        weights.add(new Matrix(outputSize, hiddenSize, "r"));
 
-        biases.add(new Matrix(hiddenSize, 1, "r"));
-        biases.add(new Matrix(outputSize, 1, "r"));
+    public ArrayList<Matrix> getWeights() {
+        return weights;
+    }
+
+    public ArrayList<Matrix> getBiases() {
+        return biases;
+    }
+
+    public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize,
+                         int outputSize, double[][] X, double[][] Y) {
+        this.weights.add(new Matrix(hiddenSize, inputSize, "r"));
+        this.weights.add(new Matrix(outputSize, hiddenSize, "r"));
+
+        this.biases.add(new Matrix(hiddenSize, 1, "r"));
+        this.biases.add(new Matrix(outputSize, 1, "r"));
+
+        this.X = X;
+        this.Y = Y;
         //add iteration here to define the layers
     }
 
-    public Matrix feedForward(double[] xInput) {
+    public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize,
+                         int outputSize) {
+        this.weights.add(new Matrix(hiddenSize, inputSize, "r"));
+        this.weights.add(new Matrix(outputSize, hiddenSize, "r"));
+
+        this.biases.add(new Matrix(hiddenSize, 1, "r"));
+        this.biases.add(new Matrix(outputSize, 1, "r"));
+
+        getTrainingData();
+        //add iteration here to define the layers
+    }
+
+    public void getTrainingData(){
+        double[][] X;
+        double[][] Y;
+
+        try{
+            File trainingData = new File("src/main/java/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
+            BufferedReader fileReader = new BufferedReader(new FileReader(trainingData));
+
+            String data;
+
+            while ((data = fileReader.readLine()) != null){
+                System.out.println(data);
+            }
+
+        }catch(Exception exception){
+            System.out.println("There was a file error");
+            exception.printStackTrace();
+        }
+        //this.X = X;
+        //this.Y = Y;
+    }
+
+    public NeuralNetwork(Matrix inputToHiddenWeights, Matrix inputToHiddenBiases,
+                         Matrix hiddenToOuputWeights, Matrix hiddenToOutputBiases) {
+        this.weights.add(inputToHiddenWeights);
+        this.weights.add(hiddenToOuputWeights);
+
+        this.biases.add(inputToHiddenBiases);
+        this.biases.add(hiddenToOutputBiases);
+    }
+
+    private Matrix feedForward(double[] xInput) {
         Matrix input = Matrix.fromArray(xInput);
 
         this.input = input;
@@ -43,7 +102,8 @@ public class NeuralNetwork {
         return output;
     }
 
-    public void backwardPropagation(Matrix output, double[] expectedResultY, double learningRate) {
+    private void backwardPropagation(Matrix output, double[] expectedResultY,
+                                     double learningRate) {
         Matrix expectedResult = Matrix.fromArray(expectedResultY);
         Matrix error = Matrix.subtract(expectedResult, output);
 
@@ -79,31 +139,66 @@ public class NeuralNetwork {
 
     }
 
-    public void fit(int epochs, double learningRate, double[][] traingingDataX,
-                    double[][] traingingDataY) {
+    public void fit(int epochs, double learningRate) {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Fit with diagnostic information? [Y/N]");
+        boolean withDiagnositic = false;
+        if (input.next().equalsIgnoreCase("Y")) {
+            withDiagnositic = true;
+        }
         for (int i = 0; i < epochs; i++) {
             hiddens.clear();
-            int sampleNumber = (int) (Math.random() * traingingDataX.length);
+            int sampleNumber = (int) (Math.random() * this.X.length);
             //does a training pass
-            Matrix output = feedForward(traingingDataX[sampleNumber]);
-            backwardPropagation(output, traingingDataY[sampleNumber], learningRate);
-
-            System.out.println("INFO: EPOCH: " + i + 1 + " INPUT: " + Arrays.toString(traingingDataX[sampleNumber]) + " OUTPUT: " + output.toString());
+            Matrix output = feedForward(this.X[sampleNumber]);
+            backwardPropagation(output, this.Y[sampleNumber], learningRate);
+            if (withDiagnositic) {
+                System.out.println("INFO: EPOCH: " + i + 1 + " INPUT: " + Arrays.toString(this.X[sampleNumber]) + " OUTPUT: " + output.toString());
+            }
         }
     }
 
-    public List<Double> predict(double[] X)
-    {
+    public List<Double> predict(double[] X) {
         Matrix input = Matrix.fromArray(X);
         Matrix hidden = Matrix.multiply(this.weights.get(0), input);
         hidden.add(this.biases.get(0));
         hidden.sigmoid();
 
-        Matrix output = Matrix.multiply(this.weights.get(1),hidden);
+        Matrix output = Matrix.multiply(this.weights.get(1), hidden);
         output.add(this.biases.get(1));
         output.sigmoid();
 
         return output.toArray();
+    }
+
+    public void saveNetwork(String filename) {
+        File saveFile;
+        try {
+            saveFile = new File("src/main/java/company/objects/neuralNetwork/saveFiles/"+filename);
+            System.out.println("Save File Created");
+        } catch (Exception e1) {
+            System.out.println("An error occured");
+            e1.printStackTrace();
+            saveFile = null;
+        }
+        try{
+            assert saveFile != null;
+            Writer fileWriter = new FileWriter(saveFile);
+            for (int i = 0; i < this.weights.size(); i++) {
+                String text = weights.get(i).toString();
+                fileWriter.write(text);
+            }
+            System.out.println("Weights Written");
+            for (int i = 0; i < this.biases.size(); i++) {
+                String text = biases.get(i).toString();
+                fileWriter.write(text);
+            }
+            System.out.println("Biases Written");
+        }catch (Exception e2) {
+            System.out.println("An error occured");
+            e2.printStackTrace();
+        }
+        //idk why this wont work, will find out on wednesday
     }
 
     public static void main(String[] args) {
@@ -115,13 +210,31 @@ public class NeuralNetwork {
         };
         double[][] Y = {
                 {0}, {1}, {1}, {0}
-        };
-        NeuralNetwork nn = new NeuralNetwork(2,0,10, 1);
-        nn.fit(50000, 0.1, X, Y);
-        System.out.println(Arrays.toString(X[0]));
-        System.out.println(nn.predict(X[0]));
-        System.out.println(Arrays.toString(X[1]));
-        System.out.println(nn.predict(X[1]));
+        };/*
+        NeuralNetwork nn = new NeuralNetwork(2, 0, 10, 1, X, Y);
+        nn.fit(50000, 0.1);
+
+        System.out.println(Arrays.toString(X[2]));
+        System.out.println(nn.predict(X[2]));
+        ArrayList<Matrix> weights = nn.getWeights();
+        ArrayList<Matrix> biases = nn.getBiases();
+
+        for (int i = 0; i < weights.size(); i++) {
+            System.out.println("Weight " + i);
+            System.out.println(weights.get(i));
+            System.out.println();
+        }
+        System.out.println();
+        for (int i = 0; i < biases.size(); i++) {
+            System.out.println("Biase " + i);
+            System.out.println(biases.get(i));
+            System.out.println();
+        }
+
+        nn.saveNetwork("testSave");*/
+        NeuralNetwork nn = new NeuralNetwork(2, 0, 10, 1, X, Y);
+
+        nn.getTrainingData();
     }
 }
 

@@ -85,7 +85,7 @@ public class DijkstraShortestPath {
             path.addVertex(current.getVertex());
             if (current.getPrevious() != null) {
                 current = visited.get(getRoutingVertex(visited, current.getPrevious().getId()));
-            }else{
+            } else {
                 break;
             }
         }
@@ -115,16 +115,29 @@ public class DijkstraShortestPath {
     public static void generateData() {
         File trainingData;
         try {
-            trainingData = new File("src/com/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
+            trainingData = new File("src/main/java/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
             System.out.println("file created");
         } catch (Exception e1) {
-            System.out.println("An error occurred" + e1);
+            System.out.println("An error occured");
+            e1.printStackTrace();
             trainingData = null;
         }
         try {
             assert trainingData != null;
             Writer fileWriter = new FileWriter(trainingData);
             Graph graph = readGraph();
+            for (int i = 0; i < graph.getVertexAmount(); i++) {
+                for (int j = 0; j < graph.getVertexAmount(); j++) {
+                    if (i != j) {
+                        String start = Integer.toString(i);
+                        String end = Integer.toString(j);
+                        System.out.println(start + "," + end);
+                        fileWriter.write(start + "," + end + "\n");
+                        System.out.println("written");
+                    }
+                }
+            }
+            fileWriter.write("\n");
             for (int i = 0; i < graph.getVertexAmount(); i++) {
                 for (int j = 0; j < graph.getVertexAmount(); j++) {
                     if (i != j) {
@@ -136,11 +149,12 @@ public class DijkstraShortestPath {
             }
             fileWriter.close();
         } catch (Exception e2) {
-            System.out.println("there was an error" + e2);
+            System.out.println("An error occured");
+            e2.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        System.out.println(dijkstra(0, 7).getRoute());
+        DijkstraShortestPath.generateData();
     }
 }

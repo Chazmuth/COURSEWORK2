@@ -88,6 +88,8 @@ public class SQLFunctions {
                 graph.addEdge(new Edge(edgeData));
             }
 
+            connectionStatementPair.closeConnection();
+
         } catch (Exception e) {
             System.out.println("Error in the SQL class: " + e);
             graph = new Graph(0);
