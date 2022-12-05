@@ -1,9 +1,8 @@
 package company.objects.neuralNetwork;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class NerualNetwork {
+public class NeuralNetwork {
     Matrix input;
     ArrayList<Matrix> weights = new ArrayList<>();
     ArrayList<Matrix> biases = new ArrayList<>();
@@ -15,7 +14,7 @@ public class NerualNetwork {
     //hidden layer needs to be used to calculate the amounts each
     //weight matrix needs to change by
 
-    public NerualNetwork(int inputSize, int hiddenAmount, int hiddenSize, int outputSize) {
+    public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize, int outputSize) {
         weights.add(new Matrix(hiddenSize, inputSize, "r"));
         weights.add(new Matrix(outputSize, hiddenSize, "r"));
 
@@ -26,6 +25,8 @@ public class NerualNetwork {
 
     public Matrix feedForward(double[] xInput) {
         Matrix input = Matrix.fromArray(xInput);
+
+        this.input = input;
 
         //input to hidden
         hiddens.add(Matrix.multiply(weights.get(0), input));
@@ -40,26 +41,67 @@ public class NerualNetwork {
         return output;
     }
 
-    public void backwardPropagation(Matrix output, double [] expectedResultY, double learningRate) {
+    public void backwardPropagation(Matrix output, double[] expectedResultY, double learningRate) {
         Matrix expectedResult = Matrix.fromArray(expectedResultY);
         Matrix error = Matrix.subtract(expectedResult, output);
 
+        //calculates the gradient for biase 1
         Matrix biases1Gradient = output.dsigmoid();
+        biases1Gradient.multiply(error);
+        biases1Gradient.multiply(learningRate);
 
+        //calculates the gradient for weight 1
+        Matrix hiddenTransposed = this.hiddens.get(0);
+        Matrix deltaWeight1 = Matrix.multiply(biases1Gradient, hiddenTransposed);
+
+        //adds the gradient to the weight 1 and biase 1
+        this.weights.get(1).add(deltaWeight1);
+        this.biases.get(1).add(biases1Gradient);
+
+        //calculates hidden errors
+        Matrix weight1Transposed = Matrix.transpose(this.weights.get(1));
+        Matrix hiddenErrors = Matrix.multiply(weight1Transposed, error);
+
+        //calculates the gradient for biase 0
+        Matrix hiddenGradient = this.hiddens.get(0).dsigmoid();
+        hiddenGradient.multiply(hiddenErrors);
+        hiddenGradient.multiply(learningRate);
+
+        //calulates gradient for weight 0
+        Matrix inputTransposed = Matrix.transpose(this.input);
+        Matrix deltaWeight0 = Matrix.multiply(hiddenGradient, inputTransposed);
+
+        //adds the gradient to the weight 0 and biase 0
+        this.weights.get(0).add(deltaWeight0);
+        this.biases.get(0).add(hiddenGradient);
     }
 
     public void fit(int epochs, double learningRate, double[][] traingingDataX,
-                      double[][] traingingDataY) {
+                    double[][] traingingDataY) {
         for (int i = 0; i < epochs; i++) {
             hiddens.clear();
             double error = 0;
-            int sampleNumber = (int)(Math.random() * traingingDataX.length);
-            System.out.println("INFO: EPOCH: " + i + 1 + " ERROR: " + error);
+            int sampleNumber = (int) (Math.random() * traingingDataX.length);
+            //does a training pass
+            Matrix output = feedForward(traingingDataX[sampleNumber]);
+            backwardPropagation(output, traingingDataY[sampleNumber], learningRate);
+
+            System.out.println("INFO: EPOCH: " + i + 1 + " OUTPUT: " + output.toString());
         }
     }
 
     public static void main(String[] args) {
-
+        double[][] X = {
+                {0, 0},
+                {1, 0},
+                {0, 1},
+                {1, 1}
+        };
+        double[][] Y = {
+                {0}, {1}, {1}, {0}
+        };
+        NeuralNetwork nn = new NeuralNetwork(2,0,10, 1);
+        nn.fit(50000, 0.1, X, Y);
     }
 }
 

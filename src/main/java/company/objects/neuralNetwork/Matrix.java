@@ -19,13 +19,6 @@ class Matrix {
                 }
             }
         }
-        if (type.equals("z")/*inits with 0s*/) {
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    data[i][j] = 0;
-                }
-            }
-        }
     }
 
     //initialises a matrix (mathematic 2d number array) - which is essential for machine learning
@@ -50,18 +43,15 @@ class Matrix {
 
     //adds a double to every number in this matrix
 
-    public void add(Matrix m)
-    {
-        if(cols!=m.cols || rows!=m.rows) {
+    public void add(Matrix m) {
+        if (cols != m.cols || rows != m.rows) {
             System.out.println("Shape Mismatch");
             return;
         }
 
-        for(int i=0;i<rows;i++)
-        {
-            for(int j=0;j<cols;j++)
-            {
-                this.data[i][j]+=m.data[i][j];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this.data[i][j] += m.data[i][j];
             }
         }
     }
@@ -154,17 +144,14 @@ class Matrix {
     //the result
 
     public static Matrix multiply(Matrix a, Matrix b) {
-        Matrix temp=new Matrix(a.rows,b.cols, "z");
-        for(int i=0;i<temp.rows;i++)
-        {
-            for(int j=0;j<temp.cols;j++)
-            {
-                double sum=0;
-                for(int k=0;k<a.cols;k++)
-                {
-                    sum+=a.data[i][k]*b.data[k][j];
+        Matrix temp = new Matrix(a.rows, b.cols, "z");
+        for (int i = 0; i < temp.rows; i++) {
+            for (int j = 0; j < temp.cols; j++) {
+                double sum = 0;
+                for (int k = 0; k < a.cols - 1; k++) {
+                    sum += a.data[i][k] * b.data[k][j];
                 }
-                temp.data[i][j]=sum;
+                temp.data[i][j] = sum;
             }
         }
         return temp;
@@ -172,10 +159,11 @@ class Matrix {
 
 
     public static Matrix fromArray(double[] x) {
-        Matrix temp = new Matrix(1, x.length, "n");
+        Matrix temp = new Matrix(x.length, 1, "z");
         for (int i = 0; i < x.length; i++)
-            temp.data[0][i] = x[i];
+            temp.data[i][0] = x[i];
         return temp;
+
     }
 
     //makes an matrix from a given array
@@ -221,7 +209,7 @@ class Matrix {
         return Arrays.deepToString(this.data).replace("], ", "]\n").replace("[[", "[").replace("]]", "]");
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
     }
 }
