@@ -21,21 +21,18 @@ public class Path {
         route.add(node);
     }
 
-    public String getRoute() {
-        StringJoiner stringJoiner = new StringJoiner(",");
+    public ArrayList<Integer> getRoute() {
         Collections.reverse(route);
         for (int i = 0; i < this.route.size(); i++) {
             if (i < this.route.size() - 1) {
                 int node = this.route.get(i).getId();
-                stringJoiner.add(Integer.toString(node));
                 nodes.add(node);
             } else {
                 int node = this.route.get(i).getId();
-                stringJoiner.add(Integer.toString(node));
                 nodes.add(node);
             }
         }
-        return stringJoiner.toString();
+        return nodes;
     }
 
     public int getCost() {

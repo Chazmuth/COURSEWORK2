@@ -1,10 +1,13 @@
 package company.objects.neuralNetwork;
 
+import company.objects.neuralNetwork.trainingDataGeneration.DijkstraShortestPath;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+
 
 public class NeuralNetwork {
     Matrix input;
@@ -62,75 +65,10 @@ public class NeuralNetwork {
     }
 
     public void getTrainingData() {
-        ArrayList<double[]> XDynamic = new ArrayList<>();
-        ArrayList<double[]> YDynamic = new ArrayList<>();
+        ArrayList<double[][]> trainingData =  DijkstraShortestPath.generateData();
 
-        try {
-            File trainingData = new File("src/main/java/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
-            Scanner fileReader = new Scanner(trainingData);
-
-            int arraySize = 0;
-            boolean XReading = true;
-            int lineNumber = 1;
-            while (fileReader.hasNextLine()) {
-                if (lineNumber == 1) {
-                    arraySize = fileReader.nextInt();
-                } else {
-                    System.out.println("line number: " + lineNumber);
-                    lineNumber++;
-                    String data = fileReader.nextLine();
-                    System.out.println("Data: " + data);
-                    if (data.equals("Y")) {
-                        XReading = false;
-                    } else {
-                        String[] dataLine = data.split(",");
-                        double[] arrayToEnter = new double[arraySize];
-                        for (int i = 0; i < dataLine.length; i++) {
-                            arrayToEnter[Integer.parseInt(dataLine[i])] = 1;
-                        }
-                        if (XReading) {
-                            System.out.println(Arrays.toString(arrayToEnter));
-                            XDynamic.add(arrayToEnter);
-                        } else {
-                            System.out.println(Arrays.toString(arrayToEnter));
-                            YDynamic.add(arrayToEnter);
-                        }
-                    }
-                }
-                lineNumber++;
-            }
-        } catch (Exception exception) {
-            System.out.println("There was a file error");
-            exception.printStackTrace();
-        }
-        System.out.println("Data formatted");
-        System.out.println("X");
-        for (int i = 0; i < XDynamic.size(); i++) {
-            System.out.println(Arrays.toString(XDynamic.get(i)));
-        }
-        System.out.println("");
-        System.out.println("Y");
-        for (int i = 0; i < YDynamic.size(); i++) {
-            System.out.println(Arrays.toString(YDynamic.get(i)));
-        }
-        double[][] X = new double[XDynamic.size()][];
-        double[][] Y = new double[YDynamic.size()][];
-
-        for (int i = 0; i < XDynamic.size(); i++) {
-            X[i] = XDynamic.get(i);
-            Y[i] = YDynamic.get(i);
-        }
-        this.X = X;
-        this.Y = Y;
-    }
-
-    public void readFile() throws FileNotFoundException {
-        File trainingData = new File("src/main/java/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
-        Scanner reader = new Scanner(trainingData);
-
-        while (reader.hasNext()) {
-            System.out.println(reader.nextLine());
-        }
+        this.X = trainingData.get(0);
+        this.Y = trainingData.get(1);
     }
 
     public NeuralNetwork(Matrix inputToHiddenWeights, Matrix inputToHiddenBiases,
@@ -211,7 +149,7 @@ public class NeuralNetwork {
             Matrix output = feedForward(this.X[sampleNumber]);
             backwardPropagation(output, this.Y[sampleNumber], learningRate);
             if (withDiagnositic) {
-                System.out.println("INFO: EPOCH: " + i + 1 + " INPUT: " + Arrays.toString(this.X[sampleNumber]) + " OUTPUT: " + output.toString());
+                System.out.println("INFO: EPOCH: " + i + 1 + " INPUT: " + Arrays.toString(this.X[sampleNumber]) + " OUTPUT:\n" + output.toString());
             }
         }
     }
@@ -259,24 +197,13 @@ public class NeuralNetwork {
         //idk why this wont work, will find out on wednesday
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        double[][] X = {
-                {0, 0},
-                {1, 0},
-                {0, 1},
-                {1, 1}
-        };
-        double[][] Y = {
-                {0}, {1}, {1}, {0}
-        };/*
-        NeuralNetwork nn = new NeuralNetwork(2, 0, 10, 1, X, Y);
-        nn.fit(50000, 0.1);
+    public static void main(String[] args) {
+        NeuralNetwork network = new NeuralNetwork(8, 0, 50, 8);
 
-        System.out.println(Arrays.toString(X[2]));
-        System.out.println(nn.predict(X[2]));
-        ArrayList<Matrix> weights = nn.getWeights();
-        ArrayList<Matrix> biases = nn.getBiases();
-
+        network.fit(30000, 0.05);
+        System.out.println(DijkstraShortestPath.dijkstra(1, 7).getRoute());
+        System.out.println(network.predict(new double[]{0,1,0,0,0,0,0,1}));
+        /*
         for (int i = 0; i < weights.size(); i++) {
             System.out.println("Weight " + i);
             System.out.println(weights.get(i));
@@ -290,13 +217,6 @@ public class NeuralNetwork {
         }
 
         nn.saveNetwork("testSave");*/
-        NeuralNetwork nn = new NeuralNetwork(2, 0, 10, 1, X, Y);
-
-        nn.getTrainingData();
-        System.out.println(Arrays.deepToString(nn.getX()));
-        System.out.println(Arrays.deepToString(nn.getY()));
-
-        nn.readFile();
     }
 }
 

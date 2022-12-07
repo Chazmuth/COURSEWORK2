@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static company.DBUtils.SQLFunctions.readGraph;
@@ -112,52 +113,44 @@ public class DijkstraShortestPath {
         return 0;
     }
 
-    public static void generateData() {
-        File trainingData;
-        try {
-            trainingData = new File("src/main/java/company/objects/neuralNetwork/trainingDataGeneration/trainingData");
-            System.out.println("file created");
-        } catch (Exception e1) {
-            System.out.println("An error occured");
-            e1.printStackTrace();
-            trainingData = null;
-        }
-        try {
-            assert trainingData != null;
-            Writer fileWriter = new FileWriter(trainingData);
-            Graph graph = readGraph();
-            fileWriter.write(Integer.toString(graph.getVertexAmount()-1));
-            fileWriter.write("\n");
-            for (int i = 0; i < graph.getVertexAmount()-1; i++) {
-                for (int j = 0; j < graph.getVertexAmount()-1; j++) {
-                    if (i != j) {
-                        String start = Integer.toString(i);
-                        String end = Integer.toString(j);
-                        System.out.println(start + "," + end);
-                        fileWriter.write(start + "," + end + "\n");
-                        System.out.println("written");
+    public static ArrayList<double[][]> generateData() {
+        ArrayList<double[][]> trainingData = new ArrayList<>();
+        Graph graph = readGraph();
+        ArrayList<double[]> xDataDynamic = new ArrayList<>();
+        ArrayList<double[]> yDataDynamic = new ArrayList<>();
+        for (int i = 0; i < graph.getVertexAmount() - 1; i++) {
+            for (int j = 0; j < graph.getVertexAmount() - 1; j++) {
+                if (i != j) {
+                    double[] Xtemp = new double[graph.getVertexAmount() - 1];
+                    Xtemp[i] = 1;
+                    Xtemp[j] = 1;
+                    //System.out.println(Arrays.toString(Xtemp));
+                    xDataDynamic.add(Xtemp);
+                    double[] Ytemp = new double[graph.getVertexAmount() - 1];
+                    ArrayList<Integer> route = dijkstra(i, j).getRoute();
+                    for (int k = 0; k < route.size(); k++) {
+                        Ytemp[route.get(k)] = 1;
                     }
+                    //System.out.println(Arrays.toString(Ytemp));
+                    yDataDynamic.add(Ytemp);
                 }
             }
-            fileWriter.write("Y");
-            fileWriter.write("\n");
-            for (int i = 0; i < graph.getVertexAmount()-1; i++) {
-                for (int j = 0; j < graph.getVertexAmount()-1; j++) {
-                    if (i != j) {
-                        System.out.println(dijkstra(i, j).getRoute());
-                        fileWriter.write(dijkstra(i, j).getRoute() + "\n");
-                        System.out.println("written");
-                    }
-                }
-            }
-            fileWriter.close();
-        } catch (Exception e2) {
-            System.out.println("An error occured");
-            e2.printStackTrace();
         }
+        double[][] xData = new double[xDataDynamic.size()][];
+        xData = xDataDynamic.toArray(xData);
+
+        double[][] yData = new double[yDataDynamic.size()][];
+        yData = yDataDynamic.toArray(yData);
+
+        trainingData.add(xData);
+        trainingData.add(yData);
+
+        return trainingData;
     }
 
     public static void main(String[] args) {
-        DijkstraShortestPath.generateData();
+        ArrayList<double[][]> trainingData = DijkstraShortestPath.generateData();
+        System.out.println(Arrays.deepToString(trainingData.get(0)));
+        System.out.println(Arrays.deepToString(trainingData.get(1)));
     }
 }
