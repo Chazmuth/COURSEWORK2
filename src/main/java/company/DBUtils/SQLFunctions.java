@@ -4,12 +4,9 @@ import company.DBUtils.JobUtils.EntryJob;
 import company.DBUtils.JobUtils.Job;
 import company.objects.graph.Edge;
 import company.objects.graph.Graph;
-import company.objects.graph.Path;
-import company.objects.graph.Vertex;
 
 import java.security.MessageDigest;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -184,7 +181,6 @@ public class SQLFunctions {
 
             //iterate through the node array in jobs to add each jobnode
 
-
             for (int i = 0; i < entryJob.getPath().size(); i++) {
                 System.out.println("reached");
                 enterJobNode(generatedJobID, entryJob.getPath().get(i)+1);
@@ -275,7 +271,7 @@ public class SQLFunctions {
     }
 
     public static void main(String[] args) {
-        getTable("JobNodes");
+        getTable("Jobs");
     }
 }
 

@@ -18,6 +18,7 @@ public class EntryJob extends Job{
         this.startDate = parseDate(startDate, strip);
         this.time = time;
         this.endDate = this.startDate.plusDays(time);
+        System.out.println(this.endDate);
         this.path = path.getNodes();
     }
 
@@ -26,4 +27,8 @@ public class EntryJob extends Job{
     }
 
     //add validation so that start cannot equal end
+
+    public static void main(String[] args){
+        new EntryJob("bnnaijskd", "2000-10-10", false, 7, new Path());
+    }
 }
