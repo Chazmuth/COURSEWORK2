@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import static company.objects.neuralNetwork.trainingDataGeneration.DijkstraShortestPath.dijkstra;
+
 public class SQLFunctions {
 
     //   protected static String databaseLocation = (System.getProperty("user.dir") + "\\freightRoutingSystemDatabase.accdb");
@@ -186,8 +188,7 @@ public class SQLFunctions {
 
 
             for (int i = 0; i < entryJob.getPath().size(); i++) {
-                System.out.println("reached");
-                enterJobNode(generatedJobID, entryJob.getPath().get(i)+1);
+                enterJobNode(generatedJobID, entryJob.getPath().get(i));
             }
 
             resultSet.close();
@@ -275,10 +276,9 @@ public class SQLFunctions {
     }
 
     public static void main(String[] args) {
-        getTable("JobNodes");
+        enterJob(new EntryJob("henryjobling@gmail.com", "2000-10-10", false, 7, dijkstra(1, 7)));
     }
 }
 
-//entering the job nodes doesnt work, check the issue when you can use access
 
 //add more information to the job table such as the total cost, total time, total distance

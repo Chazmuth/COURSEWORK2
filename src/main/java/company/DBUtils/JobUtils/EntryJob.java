@@ -18,7 +18,7 @@ public class EntryJob extends Job{
         this.startDate = parseDate(startDate, strip);
         this.time = time;
         this.endDate = this.startDate.plusDays(time);
-        this.path = path.getNodes();
+        this.path = path.getRoute();
     }
 
     public ArrayList<Integer> getPath() {

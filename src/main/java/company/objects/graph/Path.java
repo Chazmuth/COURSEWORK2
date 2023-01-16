@@ -38,9 +38,5 @@ public class Path {
     public int getCost() {
         return cost;
     }
-
-    public ArrayList<Integer> getNodes() {
-        return nodes;
-    }
 }
 

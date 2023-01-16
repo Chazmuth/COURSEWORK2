@@ -15,11 +15,6 @@ import dnl.utils.text.table.TextTable;
 public class Main {
     protected String user;
 
-    public static void main(String[] args) {
-        Main main = new Main();
-        main.run();
-    }
-
     public boolean login(Scanner input) {
         //add input validation
         boolean accessToken;
@@ -120,5 +115,10 @@ public class Main {
                 }
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Main main = new Main();
+        main.run();
     }
 }

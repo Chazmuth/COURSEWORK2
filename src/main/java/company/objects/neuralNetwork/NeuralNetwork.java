@@ -200,23 +200,12 @@ public class NeuralNetwork {
     public static void main(String[] args) {
         NeuralNetwork network = new NeuralNetwork(8, 0, 50, 8);
 
-        network.fit(30000, 0.05);
+        network.fit(40000, 0.05);
         System.out.println(DijkstraShortestPath.dijkstra(1, 7).getRoute());
         System.out.println(network.predict(new double[]{0,1,0,0,0,0,0,1}));
-        /*
-        for (int i = 0; i < weights.size(); i++) {
-            System.out.println("Weight " + i);
-            System.out.println(weights.get(i));
-            System.out.println();
-        }
-        System.out.println();
-        for (int i = 0; i < biases.size(); i++) {
-            System.out.println("Biase " + i);
-            System.out.println(biases.get(i));
-            System.out.println();
-        }
 
-        nn.saveNetwork("testSave");*/
+
+        network.saveNetwork("testSave");
     }
 }
 
