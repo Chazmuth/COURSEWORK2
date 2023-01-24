@@ -67,11 +67,13 @@ public class Main {
         int destination = input.nextInt();
         System.out.println("Calculating...");
         Path route = DijkstraShortestPath.dijkstra(source, destination);
+        System.out.println(route.getRoute());
         System.out.println("Enter a date in the format [yyyy-MM-dd]: ");
         String startDate = input.next();
 
         System.out.println(startDate);
         int time = route.getCost();
+        System.out.println("COST "+time);
         EntryJob newJob = new EntryJob(this.user, startDate, false,
                 time, route);
         SQLFunctions.enterJob(newJob);
