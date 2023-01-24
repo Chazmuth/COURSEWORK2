@@ -39,18 +39,6 @@ public class NeuralNetwork {
         return Y;
     }
 
-    public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize,
-                         int outputSize, double[][] X, double[][] Y) {
-        this.weights.add(new Matrix(hiddenSize, inputSize, "r"));
-        this.weights.add(new Matrix(outputSize, hiddenSize, "r"));
-
-        this.biases.add(new Matrix(hiddenSize, 1, "r"));
-        this.biases.add(new Matrix(outputSize, 1, "r"));
-
-        this.X = X;
-        this.Y = Y;
-        //add iteration here to define the layers
-    }
 
     public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize,
                          int outputSize) {
@@ -64,8 +52,18 @@ public class NeuralNetwork {
         //add iteration here to define the layers
     }
 
+    public NeuralNetwork(String filename) {
+        try {
+            File saveFile = new File("src/main/java/company/objects/neuralNetwork/saveFiles/" + filename);
+            Scanner fileReader = new Scanner(saveFile);
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+        }
+    }
+
     public void getTrainingData() {
-        ArrayList<double[][]> trainingData =  DijkstraShortestPath.generateData();
+        ArrayList<double[][]> trainingData = DijkstraShortestPath.generateData();
 
         this.X = trainingData.get(0);
         this.Y = trainingData.get(1);
@@ -181,20 +179,28 @@ public class NeuralNetwork {
             assert saveFile != null;
             Writer fileWriter = new FileWriter(saveFile);
             for (int i = 0; i < this.weights.size(); i++) {
-                String text = weights.get(i).toString();
-                fileWriter.write(text);
+                String text = "W" + i + "\n" + this.weights.get(i).toString();
+                fileWriter.write(text + "\n");
+                System.out.println("Written");
             }
             System.out.println("Weights Written");
             for (int i = 0; i < this.biases.size(); i++) {
-                String text = biases.get(i).toString();
-                fileWriter.write(text);
+                fileWriter.write("B" + i + "\n");
+                Matrix biase = biases.get(i);
+                for (int j = 0; j < biase.rows; j++) {
+                    String text = Double.toString(biase.data[j][0]);
+                    System.out.println(text);
+                    fileWriter.write(text + "\n");
+                }
+                System.out.println("Written");
+
             }
             System.out.println("Biases Written");
+            fileWriter.close();
         } catch (Exception e2) {
             System.out.println("An error occured");
             e2.printStackTrace();
         }
-        //idk why this wont work, will find out on wednesday
     }
 
     public static void main(String[] args) {
@@ -202,9 +208,10 @@ public class NeuralNetwork {
 
         network.fit(40000, 0.05);
         System.out.println(DijkstraShortestPath.dijkstra(1, 7).getRoute());
-        System.out.println(network.predict(new double[]{0,1,0,0,0,0,0,1}));
+        System.out.println(network.predict(new double[]{0, 1, 0, 0, 0, 0, 0, 1}));
 
 
+        //System.out.println(network.biases.get(0).toString());
         network.saveNetwork("testSave");
     }
 }
