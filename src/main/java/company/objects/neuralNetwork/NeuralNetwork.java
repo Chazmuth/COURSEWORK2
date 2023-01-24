@@ -56,6 +56,13 @@ public class NeuralNetwork {
         try {
             File saveFile = new File("src/main/java/company/objects/neuralNetwork/saveFiles/" + filename);
             Scanner fileReader = new Scanner(saveFile);
+            ArrayList<Matrix> weights = new ArrayList<>();
+            ArrayList<Matrix> biases = new ArrayList<>();
+            boolean metaDataRead = false;
+            boolean weightsRead = false;
+            while(fileReader.hasNext()){
+
+            }
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
@@ -178,6 +185,9 @@ public class NeuralNetwork {
         try {
             assert saveFile != null;
             Writer fileWriter = new FileWriter(saveFile);
+            String weights = Integer.toString(this.weights.size());
+            String biases = Integer.toString(this.biases.size());
+            fileWriter.write(weights+biases+"\n");
             for (int i = 0; i < this.weights.size(); i++) {
                 String text = "W" + i + "\n" + this.weights.get(i).toString();
                 fileWriter.write(text + "\n");
@@ -186,7 +196,7 @@ public class NeuralNetwork {
             System.out.println("Weights Written");
             for (int i = 0; i < this.biases.size(); i++) {
                 fileWriter.write("B" + i + "\n");
-                Matrix biase = biases.get(i);
+                Matrix biase = this.biases.get(i);
                 for (int j = 0; j < biase.rows; j++) {
                     String text = Double.toString(biase.data[j][0]);
                     System.out.println(text);
@@ -204,15 +214,7 @@ public class NeuralNetwork {
     }
 
     public static void main(String[] args) {
-        NeuralNetwork network = new NeuralNetwork(8, 0, 50, 8);
-
-        network.fit(40000, 0.05);
-        System.out.println(DijkstraShortestPath.dijkstra(1, 7).getRoute());
-        System.out.println(network.predict(new double[]{0, 1, 0, 0, 0, 0, 0, 1}));
-
-
-        //System.out.println(network.biases.get(0).toString());
-        network.saveNetwork("testSave");
+        NeuralNetwork network = new NeuralNetwork("testSave");
     }
 }
 
