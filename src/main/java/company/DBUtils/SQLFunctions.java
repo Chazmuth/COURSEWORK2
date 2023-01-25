@@ -7,10 +7,12 @@ import company.objects.graph.Graph;
 import company.objects.graph.Path;
 import company.objects.graph.Vertex;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import static company.objects.neuralNetwork.trainingDataGeneration.DijkstraShortestPath.dijkstra;
@@ -250,7 +252,7 @@ public class SQLFunctions {
             connectionStatementPair.getConnection().close();
             statement.close();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Error in the SQL class: ");
             e.printStackTrace();
         }
@@ -275,8 +277,43 @@ public class SQLFunctions {
         return hashedPassword;
     }
 
+    public static void enterNode(int nodeID, String name) {
+        try {
+            ConnectionStatementPair connectionStatementPair = init();
+            PreparedStatement statement = connectionStatementPair.getConnection().
+                    prepareStatement("INSERT INTO Nodes(nodeID ,name, areaID) VALUES(?,?)");
+
+            statement.setInt(1, nodeID);
+            statement.setString(2, name);
+            statement.setInt(3, 1);
+
+            statement.executeUpdate();
+
+            connectionStatementPair.getConnection().close();
+            statement.close();
+
+        } catch (Exception e) {
+            System.out.println("Error in the SQL class: ");
+            e.printStackTrace();
+        }
+    }
+
+
     public static void main(String[] args) {
-        enterJob(new EntryJob("henryjobling@gmail.com", "2000-10-10", false, 7, dijkstra(1, 7)));
+        /*try {
+            Scanner fileReader = new Scanner(new File("src/main/java/company/databaseFiles/fullGraph/nodes"));
+            while(fileReader.hasNext()){
+                String[] data = fileReader.next().split(",");
+                System.out.println("nodeID: "+data[0]);
+                System.out.println("name: "+data[1]);
+
+            }
+
+        }catch (Exception e){
+            System.out.println(e);
+        }*/
+        enterNode(1,"test");
+        getTable("Nodes");
     }
 }
 
