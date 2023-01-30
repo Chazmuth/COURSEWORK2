@@ -1,5 +1,7 @@
 package company.objects.graph;
 
+import company.DBUtils.SQLFunctions;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -96,6 +98,7 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-
+        Graph graph = SQLFunctions.readGraph();
+        graph.printGraph();
     }
 }

@@ -281,13 +281,13 @@ public class SQLFunctions {
         try {
             ConnectionStatementPair connectionStatementPair = init();
             PreparedStatement statement = connectionStatementPair.getConnection().
-                    prepareStatement("");
-            //INSERT INTO Nodes(nodeID ,name, areaID) VALUES(?,?,?)
-            /*
+                    prepareStatement("INSERT INTO Nodes(nodeID ,name, areaID) VALUES(?,?,?)");
+            //
+
             statement.setInt(1, nodeID);
             statement.setString(2, name);
             statement.setInt(3, 1);
-            */
+
             statement.executeUpdate();
 
             connectionStatementPair.getConnection().close();
@@ -299,22 +299,48 @@ public class SQLFunctions {
         }
     }
 
+    public static void enterEdge(int edgeID, float cost, float time, float CO2, int startNode, int endNode, float distance) {
+        try {
+            ConnectionStatementPair connectionStatementPair = init();
+            PreparedStatement statement = connectionStatementPair.getConnection().
+                    prepareStatement("INSERT INTO Edges(edgeID ,cost, Time, CO2, StartNode, EndNode, Distance) VALUES(?,?,?,?,?,?,?)");
+            //
+
+            statement.setInt(1, edgeID);
+            statement.setFloat(2, cost);
+            statement.setFloat(3, time);
+            statement.setFloat(4, CO2);
+            statement.setInt(5, startNode);
+            statement.setInt(6, endNode);
+            statement.setFloat(7, distance);
+
+
+            statement.executeUpdate();
+
+            connectionStatementPair.getConnection().close();
+            statement.close();
+
+        } catch (Exception e) {
+            System.out.println("Error in the SQL class: ");
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
-        /*try {
-            Scanner fileReader = new Scanner(new File("src/main/java/company/databaseFiles/fullGraph/nodes"));
+        try {
+            Scanner fileReader = new Scanner(new File("src/main/java/company/databaseFiles/fullGraph/edges"));
             while(fileReader.hasNext()){
                 String[] data = fileReader.next().split(",");
-                System.out.println("nodeID: "+data[0]);
-                System.out.println("name: "+data[1]);
-
+                for (int i = 0; i < data.length; i++) {
+                    System.out.println(i + ":" + data[i]);
+                }
+                enterEdge(Integer.parseInt(data[0]), Float.parseFloat(data[4]), Float.parseFloat(data[6]),
+                        Float.parseFloat(data[5]), Integer.parseInt(data[1]), Integer.parseInt(data[2]), Float.parseFloat(data[3]));
             }
 
         }catch (Exception e){
             System.out.println(e);
-        }*/
-        enterNode(1,"test");
-        getTable("Nodes");
+        }
     }
 }
 

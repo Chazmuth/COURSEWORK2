@@ -3,7 +3,6 @@ package company.objects.neuralNetwork;
 import company.objects.neuralNetwork.trainingDataGeneration.DijkstraShortestPath;
 
 import java.io.*;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -175,7 +174,10 @@ public class NeuralNetwork {
         }
     }
 
-    public List<Double> predict(double[] X) {
+    public List<Double> predict(int startNode, int endNode) {
+        double[] X = new double[36];
+        X[startNode] = 1;
+        X[endNode] = 1;
         Matrix input = Matrix.fromArray(X);
         Matrix hidden = Matrix.multiply(this.weights.get(0), input);
         hidden.add(this.biases.get(0));
@@ -230,7 +232,11 @@ public class NeuralNetwork {
     }
 
     public static void main(String[] args) {
-        NeuralNetwork network = new NeuralNetwork("testSave");
+        NeuralNetwork network = new NeuralNetwork(36,0,200,36);
+        network.getTrainingData();
+        network.fit(100000,0.05);
+        System.out.println(Arrays.toString(DijkstraShortestPath.dijkstra(1, 36).getRoute().toArray()));
+        System.out.println((network.predict(0, 35)));
     }
 }
 

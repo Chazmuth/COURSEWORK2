@@ -116,22 +116,22 @@ public class DijkstraShortestPath {
     public static ArrayList<double[][]> generateData() {
         ArrayList<double[][]> trainingData = new ArrayList<>();
         Graph graph = readGraph();
+        graph.printGraph();
+        System.out.println(graph.getVertexAmount() + "vertex amount ");
         ArrayList<double[]> xDataDynamic = new ArrayList<>();
         ArrayList<double[]> yDataDynamic = new ArrayList<>();
-        for (int i = 0; i < graph.getVertexAmount() - 1; i++) {
-            for (int j = 0; j < graph.getVertexAmount() - 1; j++) {
+        for (int i = 0; i < 36; i++) {
+            for (int j = 0; j < 36; j++) {
                 if (i != j) {
-                    double[] Xtemp = new double[graph.getVertexAmount() - 1];
+                    double[] Xtemp = new double[36];
                     Xtemp[i] = 1;
                     Xtemp[j] = 1;
-                    //System.out.println(Arrays.toString(Xtemp));
                     xDataDynamic.add(Xtemp);
-                    double[] Ytemp = new double[graph.getVertexAmount() - 1];
+                    double[] Ytemp = new double[36];
                     ArrayList<Integer> route = dijkstra(i, j).getRoute();
                     for (int k = 0; k < route.size(); k++) {
                         Ytemp[route.get(k)] = 1;
                     }
-                    //System.out.println(Arrays.toString(Ytemp));
                     yDataDynamic.add(Ytemp);
                 }
             }
@@ -149,8 +149,6 @@ public class DijkstraShortestPath {
     }
 
     public static void main(String[] args) {
-        ArrayList<double[][]> trainingData = DijkstraShortestPath.generateData();
-        System.out.println(Arrays.deepToString(trainingData.get(0)));
-        System.out.println(Arrays.deepToString(trainingData.get(1)));
+
     }
 }
