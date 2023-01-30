@@ -281,12 +281,13 @@ public class SQLFunctions {
         try {
             ConnectionStatementPair connectionStatementPair = init();
             PreparedStatement statement = connectionStatementPair.getConnection().
-                    prepareStatement("INSERT INTO Nodes(nodeID ,name, areaID) VALUES(?,?)");
-
+                    prepareStatement("");
+            //INSERT INTO Nodes(nodeID ,name, areaID) VALUES(?,?,?)
+            /*
             statement.setInt(1, nodeID);
             statement.setString(2, name);
             statement.setInt(3, 1);
-
+            */
             statement.executeUpdate();
 
             connectionStatementPair.getConnection().close();

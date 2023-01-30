@@ -3,6 +3,7 @@ package company.objects.neuralNetwork;
 import company.objects.neuralNetwork.trainingDataGeneration.DijkstraShortestPath;
 
 import java.io.*;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,8 +61,23 @@ public class NeuralNetwork {
             ArrayList<Matrix> biases = new ArrayList<>();
             boolean metaDataRead = false;
             boolean weightsRead = false;
-            while(fileReader.hasNext()){
+            int loopNumber = 0;
+            int weightsAndBiasesNumber = fileReader.nextInt();
+            int dataPieceNumber = 1;
+            while (fileReader.hasNext()) {
+                String[] data = fileReader.nextLine().split(",");
+                if (!weightsRead) {
 
+                    for (int i = 0; i < data.length; i++) {
+                        data[i] = data[i].replace('[',' ');
+                        data[i] = data[i].replace(']',' ');
+                        data[i] = data[i].strip();
+
+                    }
+                }
+                System.out.println(Arrays.deepToString(data));
+                System.out.println("Array");
+                loopNumber++;
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -187,7 +203,7 @@ public class NeuralNetwork {
             Writer fileWriter = new FileWriter(saveFile);
             String weights = Integer.toString(this.weights.size());
             String biases = Integer.toString(this.biases.size());
-            fileWriter.write(weights+biases+"\n");
+            fileWriter.write(weights+"\n");
             for (int i = 0; i < this.weights.size(); i++) {
                 String text = "W" + i + "\n" + this.weights.get(i).toString();
                 fileWriter.write(text + "\n");

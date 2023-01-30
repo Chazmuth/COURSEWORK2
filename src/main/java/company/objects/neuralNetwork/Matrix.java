@@ -153,10 +153,18 @@ class Matrix {
         for (int i = 0; i < x.length; i++)
             temp.data[i][0] = x[i];
         return temp;
-
     }
 
-    //makes an matrix from a given array
+    //makes a matrix from a given array(1D)
+
+    public static Matrix fromArray(double[][] x) {
+        Matrix temp = new Matrix(x.length, x[0].length, "z");
+        for (int i = 0; i < x.length; i++)
+            for (int j = 0; j < x[0].length; j++) {
+                temp.data[i][j] = x[i][j];
+            }
+        return temp;
+    }
 
     public List<Double> toArray() {
         List<Double> temp = new ArrayList<>();
