@@ -16,6 +16,8 @@ public class NeuralNetwork {
     ArrayList<Matrix> hiddens = new ArrayList<>();
     Matrix output;
 
+    String costValue;
+
     double[][] X;
     double[][] Y;
     //for each loop of the training process the result of each
@@ -41,12 +43,14 @@ public class NeuralNetwork {
 
 
     public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize,
-                         int outputSize) {
+                         int outputSize, String costValue) {
         this.weights.add(new Matrix(hiddenSize, inputSize, "r"));
         this.weights.add(new Matrix(outputSize, hiddenSize, "r"));
 
         this.biases.add(new Matrix(hiddenSize, 1, "r"));
         this.biases.add(new Matrix(outputSize, 1, "r"));
+
+        this.costValue = costValue;
 
         getTrainingData();
         //add iteration here to define the layers
@@ -68,8 +72,8 @@ public class NeuralNetwork {
                 if (!weightsRead) {
 
                     for (int i = 0; i < data.length; i++) {
-                        data[i] = data[i].replace('[',' ');
-                        data[i] = data[i].replace(']',' ');
+                        data[i] = data[i].replace('[', ' ');
+                        data[i] = data[i].replace(']', ' ');
                         data[i] = data[i].strip();
 
                     }
@@ -85,7 +89,7 @@ public class NeuralNetwork {
     }
 
     public void getTrainingData() {
-        ArrayList<double[][]> trainingData = DijkstraShortestPath.generateData();
+        ArrayList<double[][]> trainingData = DijkstraShortestPath.generateData(this.costValue);
 
         this.X = trainingData.get(0);
         this.Y = trainingData.get(1);
@@ -170,11 +174,34 @@ public class NeuralNetwork {
             backwardPropagation(output, this.Y[sampleNumber], learningRate);
             if (withDiagnositic) {
                 System.out.println("INFO: EPOCH: " + i + 1 + " INPUT: " + Arrays.toString(this.X[sampleNumber]) + " OUTPUT:\n" + output.toString());
+            } else {
+                progressPercentage(i, epochs);
             }
         }
     }
 
-    public List<Double> predict(int startNode, int endNode) {
+    public static void progressPercentage(int remain, int total) {
+        if (remain > total) {
+            throw new IllegalArgumentException();
+        }
+        int maxBareSize = 10; // 10unit for 100%
+        int remainPercent = ((100 * remain) / total) / maxBareSize;
+        char defaultChar = '-';
+        String icon = "*";
+        String bare = new String(new char[maxBareSize]).replace('\0', defaultChar) + "]";
+        StringBuilder bareDone = new StringBuilder();
+        bareDone.append("[");
+        for (int i = 0; i < remainPercent; i++) {
+            bareDone.append(icon);
+        }
+        String bareRemain = bare.substring(remainPercent);
+        System.out.print("\r" + bareDone + bareRemain + " " + remainPercent * 10 + "%");
+        if (remain == total) {
+            System.out.print("\n");
+        }
+    }
+
+    public Object[] predict(int startNode, int endNode) {
         double[] X = new double[36];
         X[startNode] = 1;
         X[endNode] = 1;
@@ -187,7 +214,17 @@ public class NeuralNetwork {
         output.add(this.biases.get(1));
         output.sigmoid();
 
-        return output.toArray();
+        return roundOutput(output.toArray());
+    }
+
+    private static Object[] roundOutput(List<Double> output){
+        ArrayList<Integer> roundedOuput = new ArrayList<>();
+        for (int i = 0; i < output.size(); i++) {
+            if(output.get(i)>0.7){
+                roundedOuput.add(i);
+            }
+        }
+        return roundedOuput.toArray();
     }
 
     public void saveNetwork(String filename) {
@@ -205,7 +242,7 @@ public class NeuralNetwork {
             Writer fileWriter = new FileWriter(saveFile);
             String weights = Integer.toString(this.weights.size());
             String biases = Integer.toString(this.biases.size());
-            fileWriter.write(weights+"\n");
+            fileWriter.write(weights + "\n");
             for (int i = 0; i < this.weights.size(); i++) {
                 String text = "W" + i + "\n" + this.weights.get(i).toString();
                 fileWriter.write(text + "\n");
@@ -232,11 +269,12 @@ public class NeuralNetwork {
     }
 
     public static void main(String[] args) {
-        NeuralNetwork network = new NeuralNetwork(36,0,200,36);
+        NeuralNetwork network = new NeuralNetwork(36, 0, 200, 36, "Time");
         network.getTrainingData();
-        network.fit(100000,0.05);
-        System.out.println(Arrays.toString(DijkstraShortestPath.dijkstra(1, 36).getRoute().toArray()));
-        System.out.println((network.predict(0, 35)));
+        network.fit(100000, 0.05);
+        network.saveNetwork("timeSave");
+        System.out.println(Arrays.toString(DijkstraShortestPath.dijkstra(1, 36, "Time").getRoute().toArray()));
+        System.out.println((Arrays.toString(network.predict(1, 35))));
     }
 }
 

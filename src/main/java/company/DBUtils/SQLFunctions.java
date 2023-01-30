@@ -68,7 +68,7 @@ public class SQLFunctions {
         }
     }
 
-    public static Graph readGraph() {
+    public static Graph readGraph(String costValue) {
         Graph graph;
         try {
             ConnectionStatementPair connectionStatementPair = init();
@@ -85,11 +85,17 @@ public class SQLFunctions {
             while (resultSet.next()) {
                 int source = Integer.parseInt(resultSet.getString("StartNode")) - 1;
                 int destination = Integer.parseInt(resultSet.getString("EndNode")) - 1;
-                StringBuilder stringCost = new StringBuilder(resultSet.getString("Cost"));
-                stringCost.delete(stringCost.length() - 5, stringCost.length());
-                int cost = Integer.parseInt(stringCost.toString());
-                int[] edgeData = {source, destination, cost};
-                graph.addEdge(new Edge(edgeData));
+                if (costValue.equals("Cost")||costValue.equals("Distance")||
+                costValue.equals("CO2")||costValue.equals("Time")) {
+                    StringBuilder stringCost = new StringBuilder(resultSet.getString(costValue));
+                    stringCost.delete(stringCost.length() - 5, stringCost.length());
+                    int cost = Integer.parseInt(stringCost.toString());
+                    int[] edgeData = {source, destination, cost};
+                    graph.addEdge(new Edge(edgeData));
+                }else{
+                    System.out.println("Please Use a valid cost value");
+                    break;
+                }
             }
 
             connectionStatementPair.closeConnection();
@@ -329,7 +335,7 @@ public class SQLFunctions {
     public static void main(String[] args) {
         try {
             Scanner fileReader = new Scanner(new File("src/main/java/company/databaseFiles/fullGraph/edges"));
-            while(fileReader.hasNext()){
+            while (fileReader.hasNext()) {
                 String[] data = fileReader.next().split(",");
                 for (int i = 0; i < data.length; i++) {
                     System.out.println(i + ":" + data[i]);
@@ -338,7 +344,7 @@ public class SQLFunctions {
                         Float.parseFloat(data[5]), Integer.parseInt(data[1]), Integer.parseInt(data[2]), Float.parseFloat(data[3]));
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
     }

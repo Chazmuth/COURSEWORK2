@@ -98,7 +98,5 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph graph = SQLFunctions.readGraph();
-        graph.printGraph();
     }
 }

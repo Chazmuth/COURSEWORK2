@@ -16,10 +16,10 @@ import static company.DBUtils.SQLFunctions.readGraph;
 
 public class DijkstraShortestPath {
 
-    public static Path dijkstra(int source, int destination) {
+    public static Path dijkstra(int source, int destination, String costValue) {
         Path path = new Path();
 
-        Graph graph = readGraph();
+        Graph graph = readGraph(costValue);
 
         Vertex sourceVertex = new Vertex(source);
         Vertex destinationVertex = new Vertex(destination);
@@ -113,11 +113,8 @@ public class DijkstraShortestPath {
         return 0;
     }
 
-    public static ArrayList<double[][]> generateData() {
+    public static ArrayList<double[][]> generateData(String costValue) {
         ArrayList<double[][]> trainingData = new ArrayList<>();
-        Graph graph = readGraph();
-        graph.printGraph();
-        System.out.println(graph.getVertexAmount() + "vertex amount ");
         ArrayList<double[]> xDataDynamic = new ArrayList<>();
         ArrayList<double[]> yDataDynamic = new ArrayList<>();
         for (int i = 0; i < 36; i++) {
@@ -128,7 +125,7 @@ public class DijkstraShortestPath {
                     Xtemp[j] = 1;
                     xDataDynamic.add(Xtemp);
                     double[] Ytemp = new double[36];
-                    ArrayList<Integer> route = dijkstra(i, j).getRoute();
+                    ArrayList<Integer> route = dijkstra(i, j, costValue).getRoute();
                     for (int k = 0; k < route.size(); k++) {
                         Ytemp[route.get(k)] = 1;
                     }
