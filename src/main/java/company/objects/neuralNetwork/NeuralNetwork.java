@@ -16,8 +16,6 @@ public class NeuralNetwork {
     ArrayList<Matrix> hiddens = new ArrayList<>();
     Matrix output;
 
-    String costValue;
-
     double[][] X;
     double[][] Y;
     //for each loop of the training process the result of each
@@ -43,14 +41,12 @@ public class NeuralNetwork {
 
 
     public NeuralNetwork(int inputSize, int hiddenAmount, int hiddenSize,
-                         int outputSize, String costValue) {
+                         int outputSize) {
         this.weights.add(new Matrix(hiddenSize, inputSize, "r"));
         this.weights.add(new Matrix(outputSize, hiddenSize, "r"));
 
         this.biases.add(new Matrix(hiddenSize, 1, "r"));
         this.biases.add(new Matrix(outputSize, 1, "r"));
-
-        this.costValue = costValue;
 
         getTrainingData();
         //add iteration here to define the layers
@@ -89,7 +85,7 @@ public class NeuralNetwork {
     }
 
     public void getTrainingData() {
-        ArrayList<double[][]> trainingData = DijkstraShortestPath.generateData(this.costValue);
+        ArrayList<double[][]> trainingData = DijkstraShortestPath.generateData();
 
         this.X = trainingData.get(0);
         this.Y = trainingData.get(1);
@@ -217,63 +213,20 @@ public class NeuralNetwork {
         return roundOutput(output.toArray());
     }
 
-    private static Object[] roundOutput(List<Double> output){
+    private static Object[] roundOutput(List<Double> output) {
         ArrayList<Integer> roundedOuput = new ArrayList<>();
         for (int i = 0; i < output.size(); i++) {
-            if(output.get(i)>0.7){
+            if (output.get(i) > 0.3) {
                 roundedOuput.add(i);
             }
         }
         return roundedOuput.toArray();
     }
-
-    public void saveNetwork(String filename) {
-        File saveFile;
-        try {
-            saveFile = new File("src/main/java/company/objects/neuralNetwork/saveFiles/" + filename);
-            System.out.println("Save File Created");
-        } catch (Exception e1) {
-            System.out.println("An error occured");
-            e1.printStackTrace();
-            saveFile = null;
-        }
-        try {
-            assert saveFile != null;
-            Writer fileWriter = new FileWriter(saveFile);
-            String weights = Integer.toString(this.weights.size());
-            String biases = Integer.toString(this.biases.size());
-            fileWriter.write(weights + "\n");
-            for (int i = 0; i < this.weights.size(); i++) {
-                String text = "W" + i + "\n" + this.weights.get(i).toString();
-                fileWriter.write(text + "\n");
-                System.out.println("Written");
-            }
-            System.out.println("Weights Written");
-            for (int i = 0; i < this.biases.size(); i++) {
-                fileWriter.write("B" + i + "\n");
-                Matrix biase = this.biases.get(i);
-                for (int j = 0; j < biase.rows; j++) {
-                    String text = Double.toString(biase.data[j][0]);
-                    System.out.println(text);
-                    fileWriter.write(text + "\n");
-                }
-                System.out.println("Written");
-
-            }
-            System.out.println("Biases Written");
-            fileWriter.close();
-        } catch (Exception e2) {
-            System.out.println("An error occured");
-            e2.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) {
-        NeuralNetwork network = new NeuralNetwork(36, 0, 200, 36, "Time");
+        NeuralNetwork network = new NeuralNetwork(36, 0, 200, 36);
         network.getTrainingData();
-        network.fit(100000, 0.05);
-        network.saveNetwork("timeSave");
-        System.out.println(Arrays.toString(DijkstraShortestPath.dijkstra(1, 36, "Time").getRoute().toArray()));
+        network.fit(50000, 0.1);
+        System.out.println(Arrays.toString(DijkstraShortestPath.dijkstra(1, 35).getRoute().toArray()));
         System.out.println((Arrays.toString(network.predict(1, 35))));
     }
 }

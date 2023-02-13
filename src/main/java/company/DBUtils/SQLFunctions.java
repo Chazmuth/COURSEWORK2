@@ -68,7 +68,7 @@ public class SQLFunctions {
         }
     }
 
-    public static Graph readGraph(String costValue) {
+    public static Graph readGraph() {
         Graph graph;
         try {
             ConnectionStatementPair connectionStatementPair = init();
@@ -85,17 +85,10 @@ public class SQLFunctions {
             while (resultSet.next()) {
                 int source = Integer.parseInt(resultSet.getString("StartNode")) - 1;
                 int destination = Integer.parseInt(resultSet.getString("EndNode")) - 1;
-                if (costValue.equals("Cost")||costValue.equals("Distance")||
-                costValue.equals("CO2")||costValue.equals("Time")) {
-                    StringBuilder stringCost = new StringBuilder(resultSet.getString(costValue));
-                    stringCost.delete(stringCost.length() - 5, stringCost.length());
-                    int cost = Integer.parseInt(stringCost.toString());
-                    int[] edgeData = {source, destination, cost};
-                    graph.addEdge(new Edge(edgeData));
-                }else{
-                    System.out.println("Please Use a valid cost value");
-                    break;
-                }
+                StringBuilder stringCost = new StringBuilder(resultSet.getString("distance"));
+                int cost = Integer.parseInt(stringCost.toString());
+                int[] edgeData = {source, destination, cost};
+                graph.addEdge(new Edge(edgeData));
             }
 
             connectionStatementPair.closeConnection();

@@ -66,7 +66,7 @@ public class Main {
         System.out.println("Enter Destination Node: ");
         int destination = input.nextInt();
         System.out.println("Calculating...");
-        Path route = DijkstraShortestPath.dijkstra(source, destination, "Cost");
+        Path route = DijkstraShortestPath.dijkstra(source, destination);
         System.out.println(route.getRoute());
         System.out.println("Enter a date in the format [yyyy-MM-dd]: ");
         String startDate = input.next();

@@ -11,22 +11,24 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static company.DBUtils.SQLFunctions.readGraph;
 
 public class DijkstraShortestPath {
 
-    public static Path dijkstra(int source, int destination, String costValue) {
+    public static ArrayList<RoutingVertex> unvisited = new ArrayList<>();
+
+    public static Path dijkstra(int source, int destination) {
         Path path = new Path();
 
-        Graph graph = readGraph(costValue);
+        Graph graph = readGraph();
 
         Vertex sourceVertex = new Vertex(source);
         Vertex destinationVertex = new Vertex(destination);
 
-        ArrayList<RoutingVertex> visited = new ArrayList<>();
-        ArrayList<RoutingVertex> unvisited = new ArrayList<>();
-        ArrayList<Vertex> graphVertecies = graph.getVertices();
+        List<RoutingVertex> visited = new ArrayList<>();
+        List<Vertex> graphVertecies = graph.getVertices();
 
 
         for (Vertex graphVertecy : graphVertecies) {
@@ -55,7 +57,8 @@ public class DijkstraShortestPath {
         int count = 0;
         while (unvisited.size() > 0) {
             count++;
-            Collections.sort(unvisited);
+            //Collections.sort(unvisited);
+            mergeSort(0, unvisited.size());
             current = unvisited.get(0);
             //sorts the unvisited list so that the
             //Routing Vertex with the lowest cost from
@@ -93,7 +96,7 @@ public class DijkstraShortestPath {
         return path;
     }
 
-    public static boolean contains(ArrayList<RoutingVertex> list, Vertex target) {
+    public static boolean contains(List<RoutingVertex> list, Vertex target) {
         boolean containsVertex = false;
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getVertex().getId() == target.getId()) {
@@ -104,7 +107,7 @@ public class DijkstraShortestPath {
         return containsVertex;
     }
 
-    public static int getRoutingVertex(ArrayList<RoutingVertex> list, int targetId) {
+    public static int getRoutingVertex(List<RoutingVertex> list, int targetId) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getVertex().getId() == targetId) {
                 return i;
@@ -113,7 +116,8 @@ public class DijkstraShortestPath {
         return 0;
     }
 
-    public static ArrayList<double[][]> generateData(String costValue) {
+    public static ArrayList<double[][]> generateData() {
+        System.out.println("Generating Training Data....");
         ArrayList<double[][]> trainingData = new ArrayList<>();
         ArrayList<double[]> xDataDynamic = new ArrayList<>();
         ArrayList<double[]> yDataDynamic = new ArrayList<>();
@@ -125,7 +129,7 @@ public class DijkstraShortestPath {
                     Xtemp[j] = 1;
                     xDataDynamic.add(Xtemp);
                     double[] Ytemp = new double[36];
-                    ArrayList<Integer> route = dijkstra(i, j, costValue).getRoute();
+                    ArrayList<Integer> route = dijkstra(i, j).getRoute();
                     for (int k = 0; k < route.size(); k++) {
                         Ytemp[route.get(k)] = 1;
                     }
@@ -145,7 +149,44 @@ public class DijkstraShortestPath {
         return trainingData;
     }
 
-    public static void main(String[] args) {
+    public static void mergeSort(int start, int end) {
+        if (start > end && (start - end) >= 1) {
+            int midPoint = (start + end) / 2;
+            mergeSort(start, midPoint);
+            mergeSort(midPoint + 1, end);
+            merge(start, midPoint, end);
+        }
+    }
 
+    public static void merge(int start, int middle, int end) {
+        ArrayList<RoutingVertex> tempArray = new ArrayList<>();
+
+        int left = start;
+        int right = middle + 1;
+
+
+        while (left <= middle && right <= end) {
+            if (unvisited.get(left).getCostFromSource() <= unvisited.get(right).getCostFromSource()) {
+                tempArray.add(unvisited.get(left));
+                left++;
+            } else {
+                tempArray.add(unvisited.get(right));
+                right++;
+            }
+        }
+        while (left <= middle) {
+            tempArray.add(unvisited.get(left));
+            left++;
+        }
+        while (right < end) {
+            tempArray.add(unvisited.get(right));
+            right++;
+        }
+        for (int i = 0; i < tempArray.size(); start++) {
+            unvisited.set(start, tempArray.get(i++));
+        }
+    }
+
+    public static void main(String[] args) {
     }
 }
